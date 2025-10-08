@@ -19,7 +19,7 @@
         }
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 140px;
+            /* scroll-padding-top будет установлен динамически */
         }
         .lightbox-arrow, .gallery-arrow {
             position: absolute;
@@ -81,7 +81,7 @@
         </div>
     </header>
 
-    <nav class="bg-gray-200 sticky top-[68px] md:top-[72px] z-20 shadow">
+    <nav class="bg-gray-200 sticky z-20 shadow">
         <div id="manufacturer-nav" class="container mx-auto px-4 md:px-6 py-2 flex justify-center space-x-2 md:space-x-4 overflow-x-auto whitespace-nowrap"></div>
     </nav>
 
@@ -340,8 +340,8 @@
                     <div id="modal-gallery-container" class="relative overflow-hidden group" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event, 'modal')">
                         <img id="gallery-image" src="${currentGallery[0]}" class="w-full h-64 md:h-full object-cover rounded-md shadow-sm cursor-pointer" alt="Фото ${engine.name}" onclick="openLightbox(currentGallery, 0)">
                         <div id="gallery-counter" class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">Фото 1 из ${currentGallery.length}</div>
-                        <div class="gallery-arrow left opacity-0 md:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(-1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
-                        <div class="gallery-arrow right opacity-0 md:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
+                        <div class="gallery-arrow left opacity-0 md:group-hover:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(-1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
+                        <div class="gallery-arrow right opacity-0 md:group-hover:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
                     </div>`;
             } else {
                  galleryHtml = `<div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center rounded-md overflow-hidden"><img src="https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter" alt="GammaMotors" class="w-full h-full object-cover"></div>`;
@@ -588,6 +588,48 @@
         // --- КОНЕЦ НОВОГО ЛАЙТБОКСА ---
 
 
+        // --- Логика для "липкой" навигации и подсветки ---
+        function updateStickyNav() {
+            const header = document.querySelector('header');
+            const nav = document.querySelector('nav');
+            if (!header || !nav) return;
+
+            const headerHeight = header.offsetHeight;
+            nav.style.top = `${headerHeight}px`;
+            document.documentElement.style.scrollPaddingTop = `${headerHeight + nav.offsetHeight + 16}px`; 
+        }
+
+        function handleScrollHighlight() {
+            const header = document.querySelector('header');
+            const nav = document.querySelector('nav');
+            if (!header || !nav) return;
+
+            const offset = header.offsetHeight + nav.offsetHeight;
+            const scrollPosition = window.scrollY;
+
+            const sections = document.querySelectorAll('main > div[id^="manufacturer-"]');
+            const navLinks = document.querySelectorAll('#manufacturer-nav a');
+
+            let activeSectionId = null;
+
+            sections.forEach(section => {
+                if (scrollPosition >= section.offsetTop - offset) {
+                    activeSectionId = section.id;
+                }
+            });
+
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                link.classList.remove('bg-blue-600', 'text-white');
+                link.classList.add('text-gray-700', 'hover:bg-gray-300');
+                if (linkHref === `#${activeSectionId}`) {
+                    link.classList.add('bg-blue-600', 'text-white');
+                    link.classList.remove('text-gray-700', 'hover:bg-gray-300');
+                }
+            });
+        }
+        // --- КОНЕЦ ЛОГИКИ НАВИГАЦИИ ---
+
         modal.addEventListener('click', (event) => { if (event.target === modal) { closeModal(); } });
         purchaseModal.addEventListener('click', (event) => { if (event.target === purchaseModal) { closePurchaseInfo(); } });
         besfitsModal.addEventListener('click', (event) => { if (event.target === besfitsModal) { closeBesfitsModal(); } });
@@ -600,13 +642,12 @@
             renderManufacturerNav();
             renderEngineGroups();
             renderCitiesDropdown();
+            updateStickyNav();
+            handleScrollHighlight(); // Initial call
+            window.addEventListener('resize', updateStickyNav);
+            window.addEventListener('scroll', handleScrollHighlight);
         });
     </script>
 </body>
 </html>
-"
-I would like you to make the following edits to the selected code:
-* add a logo to the left of the GammaMotors name. The logo should be an engine icon in blue to match the text.
-* make the "Фото/Видео склада" button always visible, even on mobile.
-* increase the font size of the text for the buttons in the header
 
