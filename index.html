@@ -86,24 +86,20 @@
     <!-- Шапка сайта -->
     <header class="bg-white shadow-md sticky top-0 z-30">
         <div class="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center">
-                <svg class="w-8 h-8 text-blue-700 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.438.995s.145.755.438.995l1.003.827a1.125 1.125 0 01.26 1.431l-1.296 2.247a1.125 1.125 0 01-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 01-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.437-.995s-.145-.755-.437-.995l-1.004-.827a1.125 1.125 0 01-.26-1.431l1.296-2.247a1.125 1.125 0 011.37-.49l1.217.456c.355.133.75.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <h1 class="text-3xl md:text-4xl font-bold text-blue-700">GammaMotors</h1>
+            <div class="flex-shrink-0">
+                <h1 class="text-2xl md:text-4xl font-bold text-blue-700">GammaMotors</h1>
             </div>
             
             <div class="flex items-center space-x-2 md:space-x-4">
-                <button id="warehouse-btn" class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-sm md:text-base">
-                    <svg class="w-5 h-5 mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                    Фото/Видео склада
+                <button id="warehouse-btn" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold p-2 md:py-2 md:px-4 rounded-lg transition-colors duration-300">
+                    <svg class="w-6 h-6 md:w-5 md:h-5 md:mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                    <span class="hidden md:inline">Фото/Видео склада</span>
                 </button>
                 <div class="relative">
-                    <button id="cities-dropdown-btn" class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-sm md:text-base">
-                        <svg class="w-5 h-5 mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+                    <button id="cities-dropdown-btn" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold p-2 md:py-2 md:px-4 rounded-lg transition-colors duration-300">
+                        <svg class="w-6 h-6 md:w-5 md:h-5 md:mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
                         <span class="hidden md:inline">Наши склады</span>
-                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                        <svg class="w-4 h-4 ml-2 hidden md:inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
                     </button>
                     <div id="cities-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-xl z-20 max-h-80 overflow-y-auto"></div>
                 </div>
@@ -344,7 +340,7 @@
                 const cityEl = document.createElement('a');
                 cityEl.href = '#';
                 cityEl.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition-colors duration-150';
-                if (isCentral) { cityEl.classList.add('font-bold', 'bg-blue-50'); }
+                if (isCentral) { cityEl.classList.add('font-bold', 'bg-blue-100', 'text-blue-800'); }
                 cityEl.textContent = cityText;
                 citiesDropdown.appendChild(cityEl);
             });
@@ -456,7 +452,7 @@
                         <h4 class="font-semibold mb-2 text-yellow-800 flex items-center"><svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.52 2.232a1 1 0 011.085.642l1.68 5.17h5.17a1 1 0 01.643 1.086 38.6 38.6 0 01-2.28 10.125.999.999 0 01-.913.645H2.086a1 1 0 01-.913-.645A38.599 38.599 0 01-.113 9.13a1 1 0 01.643-1.086h5.17l1.68-5.17a1 1 0 011.085-.642h3.044zM9.462 8.93c.27-.27.27-.707 0-.979a.692.692 0 00-.979 0l-1.68 1.68a.692.692 0 000 .979l1.68 1.68a.692.692 0 00.979 0c.27-.27.27-.707 0-.979L8.49 10.32l.972-.972zm1.06-2.652c.27-.27.707-.27.979 0l1.68 1.68a.692.692 0 010 .979l-1.68 1.68a.692.692 0 01-.979 0c-.27-.27-.27-.707 0-.979l.972-.972-.972-.972z" clip-rule="evenodd" /></svg>Проверка "Горячего Запуска"</h4>
                         <p class="text-sm text-yellow-700 mb-3">Видео заводской проверки доступно по запросу и привязано к уникальному номеру двигателя.</p>
                         <div class="relative">
-                            <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.display='none'" onpause="this.nextElementSibling.style.display='flex'" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-yellow-700\'>Видео для этой модели скоро будет добавлено.</p>';">
+                            <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-yellow-700\'>Видео для этой модели скоро будет добавлено.</p>';">
                                 <source src="${engine.hotStartVideo}" type="video/mp4">
                             </video>
                             <div class="video-overlay"><svg class="w-16 h-16 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>
@@ -514,6 +510,7 @@
         }
         
         function closeModal() {
+            modal.querySelectorAll('video').forEach(v => v.pause());
             modal.classList.add('opacity-0');
             modalContent.classList.add('scale-95');
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
@@ -548,7 +545,7 @@
             if (besfitsMedia.video) {
                 videoHtml = `
                     <div class="relative">
-                        <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.display='none'" onpause="this.nextElementSibling.style.display='flex'">
+                        <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1">
                             <source src="${besfitsMedia.video}" type="video/mp4">
                             Ваш браузер не поддерживает это видео.
                         </video>
@@ -603,19 +600,18 @@
         }
 
         function closeBesfitsModal() {
+            besfitsModal.querySelectorAll('video').forEach(v => v.pause());
             besfitsModal.classList.add('opacity-0');
             besfitsModal.querySelector('.modal-content').classList.add('scale-95');
             setTimeout(() => { besfitsModal.classList.add('hidden'); }, 300);
         }
         
-        // --- НОВАЯ ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ МЕДИА СО СКЛАДА ---
         function renderWarehouseMedia() {
             const photosContainer = document.getElementById('warehouse-photos');
             const videosContainer = document.getElementById('warehouse-videos');
 
             if (!photosContainer || !videosContainer) return;
 
-            // Отображение фотографий
             photosContainer.innerHTML = '';
             warehouseMedia.photos.forEach((photoSrc, index) => {
                 const photoEl = document.createElement('div');
@@ -627,14 +623,13 @@
                 photosContainer.appendChild(photoEl);
             });
 
-            // Отображение видео
             videosContainer.innerHTML = '';
             warehouseMedia.videos.forEach(video => {
                 const videoEl = document.createElement('div');
                 videoEl.className = 'bg-gray-100 rounded-lg overflow-hidden shadow';
                 videoEl.innerHTML = `
                     <div class="relative">
-                        <video controls controlsList="nodownload" preload="metadata" class="w-full" poster="${video.thumbnail}" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.display='none'" onpause="this.nextElementSibling.style.display='flex'">
+                        <video controls controlsList="nodownload" preload="metadata" class="w-full" poster="${video.thumbnail}" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1">
                             <source src="${video.videoUrl}" type="video/mp4">
                             Ваш браузер не поддерживает видео.
                         </video>
@@ -650,19 +645,19 @@
 
         function openWarehouseModal() {
             history.pushState({modal: 'warehouse'}, '', '#warehouse');
-            renderWarehouseMedia(); // Эта функция теперь существует
+            renderWarehouseMedia();
             document.body.style.overflow = 'hidden';
             warehouseModal.classList.remove('hidden');
             setTimeout(() => { warehouseModal.classList.remove('opacity-0'); warehouseModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
         }
 
         function closeWarehouseModal() {
+            warehouseModal.querySelectorAll('video').forEach(v => v.pause());
             warehouseModal.classList.add('opacity-0');
             warehouseModal.querySelector('.modal-content').classList.add('scale-95');
             setTimeout(() => { warehouseModal.classList.add('hidden'); document.body.style.overflow = 'auto';}, 300);
         }
 
-        // --- НОВЫЙ ЛАЙТБОКС С НАВИГАЦИЕЙ ---
         function openLightbox(gallery, startIndex = 0) {
             lightboxGallery = gallery;
             lightboxImageIndex = startIndex;
@@ -676,7 +671,10 @@
         function closeLightbox() {
             lightboxModal.classList.add('opacity-0');
             setTimeout(() => lightboxModal.classList.add('hidden'), 300);
-            document.body.style.overflow = 'auto';
+            // Восстанавливаем скролл только если никакие другие модальные окна не активны
+            if (document.querySelectorAll('.modal:not(.hidden)').length === 0) {
+                 document.body.style.overflow = 'auto';
+            }
         }
 
         function updateLightboxImage() {
@@ -697,7 +695,6 @@
             updateLightboxImage();
         }
 
-        // Обработка свайпов
         function handleTouchStart(e, source = 'lightbox') {
             if (e.touches.length === 1) { 
                 touchstartX = e.touches[0].clientX;
@@ -717,10 +714,6 @@
             }
         }
 
-        // --- КОНЕЦ НОВОГО ЛАЙТБОКСА ---
-
-
-        // --- Логика для "липкой" навигации и подсветки ---
         function updateStickyNav() {
             const header = document.querySelector('header');
             const nav = document.querySelector('nav');
@@ -745,8 +738,6 @@
             let activeSectionId = null;
 
             sections.forEach(section => {
-                // Добавляем буфер в 60px, чтобы подсветка срабатывала раньше,
-                // когда следующий раздел только начинает появляться в поле зрения.
                 if (scrollPosition >= section.offsetTop - offset - 60) {
                     activeSectionId = section.id;
                 }
@@ -763,7 +754,6 @@
             });
         }
         
-        // --- ОБРАБОТКА КНОПКИ "НАЗАД" ---
         window.addEventListener('popstate', (event) => {
             closeModal();
             closePurchaseInfo();
@@ -771,8 +761,6 @@
             closeWarehouseModal();
             closeLightbox();
         });
-
-        // --- КОНЕЦ ЛОГИКИ НАВИГАЦИИ ---
 
         citiesDropdownBtn.addEventListener('click', (event) => { event.stopPropagation(); citiesDropdown.classList.toggle('hidden'); });
         warehouseBtn.addEventListener('click', openWarehouseModal);
