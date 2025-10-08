@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GammaMotors - Продажа двигателей</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior-y: none;
+        }
+        .modal, .lightbox {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content, .lightbox-content {
+            transition: transform 0.3s ease-in-out;
+        }
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 140px;
+        }
+        .lightbox-arrow, .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, opacity 0.2s;
+            user-select: none;
+            z-index: 10;
+        }
+        .lightbox-arrow:hover, .gallery-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .lightbox-arrow.left, .gallery-arrow.left { left: 16px; }
+        .lightbox-arrow.right, .gallery-arrow.right { right: 16px; }
+        
+        #modal-gallery-container .gallery-arrow {
+            opacity: 0;
+        }
+        #modal-gallery-container:hover .gallery-arrow {
+            opacity: 1;
+        }
+        @media (pointer: coarse) {
+            #modal-gallery-container .gallery-arrow {
+                opacity: 1; /* Always show arrows on touch devices */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Шапка сайта -->
+    <header class="bg-white shadow-md sticky top-0 z-30">
+        <div class="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">GammaMotors</h1>
+            
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="warehouse-btn" class="hidden md:flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                    Фото/Видео склада
+                </button>
+                <div class="relative">
+                    <button id="cities-dropdown-btn" class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                        <svg class="w-5 h-5 mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+                        <span class="hidden md:inline">Наши склады</span>
+                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                    </button>
+                    <div id="cities-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-xl z-20 max-h-80 overflow-y-auto"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-gray-200 sticky top-[68px] md:top-[72px] z-20 shadow">
+        <div id="manufacturer-nav" class="container mx-auto px-4 md:px-6 py-2 flex justify-center space-x-2 md:space-x-4 overflow-x-auto whitespace-nowrap"></div>
+    </nav>
+
+    <main id="catalog-container" class="container mx-auto px-4 py-8 flex-grow"></main>
+
+    <div id="engineModal" class="modal fixed inset-0 bg-white hidden z-40 overflow-y-auto">
+        <div id="modalContent" class="modal-content transform"></div>
+    </div>
+    
+    <div id="purchaseModal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-sm text-center p-8 relative transform scale-95">
+            <button onclick="closePurchaseInfo()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Оформление заказа</h3>
+            <p class="text-gray-700 mb-2">Для покупки двигателя, пожалуйста, свяжитесь с нашим менеджером:</p>
+            <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+                <p class="text-xl font-semibold text-gray-900">Дамир</p>
+                <p class="text-3xl font-bold text-blue-700 my-3">8 (982) 306-69-54</p>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <a href="tel:89823066954" class="flex items-center justify-center w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        Позвонить
+                    </a>
+                    <a href="https://wa.me/79823066954" target="_blank" class="flex items-center justify-center w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-all duration-300">
+                         <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.06 22L7.31 20.62C8.75 21.41 10.36 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.04 3.67C14.24 3.67 16.31 4.5 17.87 6.06C19.43 7.62 20.28 9.69 20.28 11.91C20.28 16.47 16.6 20.15 12.04 20.15C10.56 20.15 9.12 19.78 7.85 19.07L7.45 18.84L4.05 19.75L4.97 16.41L4.74 16.01C3.96 14.71 3.56 13.25 3.56 11.91C3.56 7.35 7.24 3.67 12.04 3.67ZM8.82 7.28C8.59 7.28 8.36 7.34 8.12 7.78C7.88 8.22 7.22 8.82 7.22 10.1C7.22 11.38 8.15 12.61 8.31 12.83C8.47 13.05 10.23 15.64 12.79 16.73C14.88 17.61 15.33 17.45 15.74 17.4C16.15 17.35 17.15 16.78 17.36 16.17C17.57 15.56 17.57 15.06 17.49 14.9C17.41 14.74 17.25 14.66 17.01 14.54C16.77 14.42 15.54 13.81 15.3 13.71C15.06 13.61 14.9 13.57 14.74 13.89C14.58 14.21 14.07 14.82 13.92 14.98C13.76 15.14 13.6 15.16 13.36 15.04C13.12 14.92 12.11 14.61 10.92 13.53C10.02 12.7 9.42 11.72 9.28 11.48C9.14 11.24 9.26 11.1 9.4 10.96C9.53 10.84 9.69 10.63 9.83 10.47C9.97 10.31 10.03 10.19 10.13 10C10.23 9.81 10.17 9.65 10.09 9.53C10.01 9.41 9.49 8.2 9.25 7.72C9.01 7.24 8.77 7.28 8.82 7.28Z"></path></svg>
+                         WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="besfitsModal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div id="besfitsModalContent" class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-95 p-8 relative"></div>
+    </div>
+    
+    <div id="warehouseModal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 p-8 relative">
+            <button onclick="closeWarehouseModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <h3 class="text-3xl font-bold mb-6 text-center">Наши склады вживую</h3>
+            <h4 class="text-xl font-semibold mb-4 border-l-4 border-blue-600 pl-3">Фотографии склада</h4>
+            <div id="warehouse-photos" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8"></div>
+            <h4 class="text-xl font-semibold mb-4 border-l-4 border-blue-600 pl-3">Видеообзоры</h4>
+            <div id="warehouse-videos" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+    </div>
+
+    <div id="lightboxModal" class="lightbox fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center p-4 z-50">
+        <div class="lightbox-content relative w-full h-full flex items-center justify-center" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-5xl z-20">&times;</button>
+            <div class="lightbox-arrow left" onclick="navigateLightbox(-1)"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
+            <img id="lightboxImage" src="" class="max-w-[90vw] max-h-[90vh] object-contain z-10">
+            <div class="lightbox-arrow right" onclick="navigateLightbox(1)"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="container mx-auto px-6 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="text-2xl font-bold">GammaMotors</h3>
+                    <p class="text-gray-400">Надежные двигатели для вашего автомобиля</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-2 uppercase">Свяжитесь с нами</h4>
+                    <div class="space-y-2 text-gray-300">
+                         <a href="tel:89823066954" class="flex items-center justify-center md:justify-start hover:text-blue-400 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            8 (982) 306-69-54
+                        </a>
+                        <a href="https://wa.me/79823066954" target="_blank" class="flex items-center justify-center md:justify-start hover:text-green-400 transition-colors">
+                           <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.06 22L7.31 20.62C8.75 21.41 10.36 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.04 3.67C14.24 3.67 16.31 4.5 17.87 6.06C19.43 7.62 20.28 9.69 20.28 11.91C20.28 16.47 16.6 20.15 12.04 20.15C10.56 20.15 9.12 19.78 7.85 19.07L7.45 18.84L4.05 19.75L4.97 16.41L4.74 16.01C3.96 14.71 3.56 13.25 3.56 11.91C3.56 7.35 7.24 3.67 12.04 3.67ZM8.82 7.28C8.59 7.28 8.36 7.34 8.12 7.78C7.88 8.22 7.22 8.82 7.22 10.1C7.22 11.38 8.15 12.61 8.31 12.83C8.47 13.05 10.23 15.64 12.79 16.73C14.88 17.61 15.33 17.45 15.74 17.4C16.15 17.35 17.15 16.78 17.36 16.17C17.57 15.56 17.57 15.06 17.49 14.9C17.41 14.74 17.25 14.66 17.01 14.54C16.77 14.42 15.54 13.81 15.3 13.71C15.06 13.61 14.9 13.57 14.74 13.89C14.58 14.21 14.07 14.82 13.92 14.98C13.76 15.14 13.6 15.16 13.36 15.04C13.12 14.92 12.11 14.61 10.92 13.53C10.02 12.7 9.42 11.72 9.28 11.48C9.14 11.24 9.26 11.1 9.4 10.96C9.53 10.84 9.69 10.63 9.83 10.47C9.97 10.31 10.03 10.19 10.13 10C10.23 9.81 10.17 9.65 10.09 9.53C10.01 9.41 9.49 8.2 9.25 7.72C9.01 7.24 8.77 7.28 8.82 7.28Z"></path></svg>
+                           Написать в WhatsApp
+                        </a>
+                    </div>
+                </div>
+                 <div class="text-center md:text-right">
+                    <h4 class="text-lg font-semibold mb-2 uppercase">Режим работы</h4>
+                    <p class="text-gray-300">Пн-Пт: 9:00 - 18:00</p>
+                    <p class="text-gray-300">Сб-Вс: Прием звонков</p>
+                 </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-4 text-center text-gray-400 text-sm">
+                <p>&copy; 2024 GammaMotors. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- База данных (ОБНОВЛЕНО с учетом структуры ваших файлов) ---
+        const engines = [
+             // Hyundai / Kia
+            { id: 1, name: 'G4EC', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Getz', 'Hyundai Verna', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4ec/hot_start.mp4', specs: { 'Объем': '1.5 л', 'Мощность': '102 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатели серии Alpha, к которой относится G4EC, известны своей простотой и надежностью.' },
+            { id: 2, name: 'G4ED', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Elantra', 'Hyundai Getz', 'Kia Cerato', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4ed/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '105 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатели серии Alpha II, являются развитием надежной серии Alpha.' },
+            { id: 3, name: 'G4EE', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Getz', 'Kia Rio'], gallery: ['files/g4ee/1.jpg','files/g4ee/2.jpg','files/g4ee/3.jpg','files/g4ee/4.jpg','files/g4ee/5.jpg','files/g4ee/6.jpg','files/g4ee/7.jpg','files/g4ee/8.jpg','files/g4ee/9.jpg'], hotStartVideo: 'files/g4ee/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '97 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4EE, часть серии Alpha II, устанавливался на популярные компактные модели.' },
+            { id: 4, name: 'G4FA', price: 115000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai i20', 'Kia Rio', 'Kia Ceed'], gallery: ['files/g4fa/1.jpg','files/g4fa/2.jpg','files/g4fa/3.jpg','files/g4fa/4.jpg','files/g4fa/5.jpg','files/g4fa/6.jpg','files/g4fa/7.jpg','files/g4fa/8.jpg','files/g4fa/9.jpg','files/g4fa/10.jpg','files/g4fa/11.jpg','files/g4fa/12.jpg','files/g4fa/13.jpg'], hotStartVideo: 'files/g4fa/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Серия Gamma, является одной из самых массовых и современных линеек двигателей компании.' },
+            { id: 5, name: 'G4FC', price: 115000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai Elantra', 'Hyundai Creta', 'Kia Rio', 'Kia Ceed'], gallery: ['files/g4fc/1.png','files/g4fc/2.png','files/g4fc/3.png','files/g4fc/4.png','files/g4fc/5.png','files/g4fc/6.png','files/g4fc/8.jpg','files/g4fc/9.jpg','files/g4fc/10.jpg','files/g4fc/11.jpg','files/g4fc/12.jpg','files/g4fc/13.jpg','files/g4fc/14.jpg'], hotStartVideo: 'files/g4fc/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '123 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'G4FC - один из самых популярных двигателей серии Gamma, устанавливался на миллионы автомобилей.' },
+            { id: 6, name: 'G4FD', price: 135000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Veloster', 'Hyundai Elantra', 'Kia Cerato', 'Kia Soul'], gallery: [], hotStartVideo: 'files/g4fd/hot_start.mp4', specs: { 'Объем': '1.6 л GDI', 'Мощность': '140 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4FD (Gamma GDI) оснащен непосредственным впрыском топлива.' },
+            { id: 7, name: 'G4FG', price: 125000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Hyundai Creta', 'Kia Ceed', 'Kia Soul'], gallery: ['files/g4fg/1.jpg','files/g4fg/2.jpg','files/g4fg/3.jpg','files/g4fg/4.jpg','files/g4fg/5.jpg','files/g4fg/6.jpg','files/g4fg/7.jpg','files/g4fg/8.jpg','files/g4fg/9.jpg','files/g4fg/10.jpg','files/g4fg/11.jpg'], hotStartVideo: 'files/g4fg/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '132 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'G4FG является обновленной версией G4FC с системой Dual CVVT.' },
+            { id: 8, name: 'G4KD', price: 185000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai ix35', 'Kia Sportage', 'Kia Optima'], gallery: ['files/g4kd/1.jpg','files/g4kd/2.jpg','files/g4kd/3.jpg','files/g4kd/4.jpg','files/g4kd/5.jpg','files/g4kd/6.jpg','files/g4kd/7.jpg','files/g4kd/8.jpg','files/g4kd/9.jpg','files/g4kd/10.jpg','files/g4kd/11.jpg','files/g4kd/12.jpg','files/g4kd/13.jpg','files/g4kd/14.jpg','files/g4kd/15.jpg','files/g4kd/16.jpg','files/g4kd/17.jpg','files/g4kd/18.jpg','files/g4kd/19.jpg'], hotStartVideo: 'files/g4kd/hot_start.mp4', specs: { 'Объем': '2.0 л', 'Мощность': '150-165 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Семейство Theta II, требует внимания к состоянию катализатора и ЦПГ.' },
+            { id: 9, name: 'G4KE', price: 185000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Sportage', 'Kia Sorento'], gallery: ['files/g4ke/1.jpg','files/g4ke/2.jpg','files/g4ke/3.jpg','files/g4ke/4.jpg','files/g4ke/5.jpg','files/g4ke/6.jpg','files/g4ke/7.jpg','files/g4ke/8.jpg','files/g4ke/9.jpg','files/g4ke/10.jpg','files/g4ke/11.jpg','files/g4ke/12.jpg','files/g4ke/13.jpg','files/g4ke/14.jpg','files/g4ke/15.jpg'], hotStartVideo: 'files/g4ke/hot_start.mp4', specs: { 'Объем': '2.4 л', 'Мощность': '175-180 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4KE (Theta II) является более объемной версией G4KD.' },
+            { id: 10, name: 'G4KJ New', price: 275000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Optima', 'Kia Sorento'], gallery: ['files/g4kj_new/1.jpg','files/g4kj_new/2.jpg','files/g4kj_new/3.jpg','files/g4kj_new/4.jpg','files/g4kj_new/5.jpg','files/g4kj_new/6.jpg'], hotStartVideo: 'files/g4kj_new/hot_start.mp4', specs: { 'Объем': '2.4 л GDI', 'Мощность': '188 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'G4KJ - это двигатель Theta II с непосредственным впрыском.' },
+            { id: 11, name: 'G4KJ Old', price: 175000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Optima', 'Kia Sorento'], gallery: ['files/g4kj_old/1.jpg','files/g4kj_old/2.jpg','files/g4kj_old/3.jpg','files/g4kj_old/4.jpg','files/g4kj_old/5.jpg','files/g4kj_old/6.jpg','files/g4kj_old/7.jpg','files/g4kj_old/8.jpg','files/g4kj_old/11.jpg','files/g4kj_old/13.jpg','files/g4kj_old/15.jpg','files/g4kj_old/16.jpg'], hotStartVideo: null, specs: { 'Объем': '2.4 л GDI', 'Мощность': '201 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Ранняя версия двигателя G4KJ, которая отличалась более высокой мощностью.' },
+            { id: 12, name: 'G4LC', price: 135000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai i20', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4lc/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '100 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Семейство Kappa, отличается меньшим весом и повышенной экономичностью.' },
+            { id: 13, name: 'G4NA', price: 165000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Hyundai ix35', 'Hyundai Creta', 'Kia Sportage'], gallery: ['files/g4na/1.jpg','files/g4na/2.jpg','files/g4na/3.jpg','files/g4na/4.jpg','files/g4na/5.jpg','files/g4na/6.jpg','files/g4na/7.jpg','files/g4na/8.jpg','files/g4na/9.jpg','files/g4na/10.jpg','files/g4na/12.jpg','files/g4na/13.jpg','files/g4na/14.jpg'], hotStartVideo: 'files/g4na/hot_start.mp4', specs: { 'Объем': '2.0 л', 'Мощность': '150 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Серия Nu, является современным и массовым двигателем, пришедшим на смену Theta II.' },
+            { id: 14, name: 'G4NB', price: 165000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Kia Cerato'], gallery: ['files/g4nb/1.jpg','files/g4nb/2.jpg','files/g4nb/3.jpg','files/g4nb/4.jpg'], hotStartVideo: 'files/g4nb/hot_start.mp4', specs: { 'Объем': '1.8 л', 'Мощность': '149 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4NB из серии Nu, устанавливался на такие автомобили как Hyundai Elantra.' },
+            // VAG
+            { id: 15, name: 'CAV', price: 160000, manufacturer: 'VAG', applications: ['VW Golf', 'VW Tiguan', 'Skoda Fabia RS'], gallery: ['files/cav/1.jpg','files/cav/2.jpg','files/cav/3.jpg','files/cav/4.jpg','files/cav/5.jpg','files/cav/6.jpg','files/cav/7.jpg','files/cav/8.jpg','files/cav/9.jpg','files/cav/10.jpg','files/cav/11.jpg','files/cav/12.jpg','files/cav/13.jpg'], hotStartVideo: 'files/cav/hot_start.mp4', specs: { 'Объем': '1.4 л TSI', 'Мощность': '150-180 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель с двойным наддувом (турбина + компрессор) серии EA111.' },
+            { id: 16, name: 'CDA', price: 195000, manufacturer: 'VAG', applications: ['VW Passat', 'VW Tiguan', 'Skoda Octavia', 'Skoda Superb', 'Audi A3'], gallery: ['files/cda/1.jpg','files/cda/2.jpg','files/cda/3.jpg','files/cda/4.jpg','files/cda/5.jpg','files/cda/6.jpg','files/cda/7.jpg','files/cda/8.jpg','files/cda/9.jpg','files/cda/10.jpg','files/cda/11.jpg','files/cda/12.jpg','files/cda/13.jpg','files/cda/14.jpg'], hotStartVideo: 'files/cda/hot_start.mp4', specs: { 'Объем': '1.8 л TSI', 'Мощность': '152-160 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Популярный турбированный двигатель серии EA888 Gen2.' },
+            { id: 17, name: 'CFN', price: 125000, manufacturer: 'VAG', applications: ['VW Polo Sedan', 'VW Jetta', 'Skoda Fabia', 'Skoda Rapid'], gallery: ['files/cfn/1.jpg','files/cfn/2.jpg','files/cfn/3.jpg','files/cfn/4.jpg','files/cfn/5.jpg','files/cfn/6.jpg','files/cfn/7.jpg','files/cfn/8.jpg','files/cfn/9.jpg','files/cfn/10.jpg','files/cfn/11.jpg','files/cfn/12.jpg'], hotStartVideo: 'files/cfn/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '85-105 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Надежный атмосферный двигатель серии EA111, широко распространенный в России.' },
+            { id: 18, name: 'CWV', price: 145000, manufacturer: 'VAG', applications: ['VW Polo', 'VW Jetta', 'Skoda Rapid', 'Skoda Octavia'], gallery: ['files/cwv/1.jpg','files/cwv/2.jpg','files/cwv/3.jpg','files/cwv/4.jpg','files/cwv/5.jpg','files/cwv/6.jpg','files/cwv/7.jpg','files/cwv/8.jpg','files/cwv/9.jpg','files/cwv/10.jpg','files/cwv/11.jpg','files/cwv/12.jpg'], hotStartVideo: 'files/cwv/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '90-110 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Современный атмосферный двигатель серии EA211, пришедший на смену CFNA.' },
+            // General Motors
+            { id: 19, name: 'A08S3', price: 89000, manufacturer: 'General Motors', applications: ['Daewoo Matiz', 'Chevrolet Spark'], gallery: ['files/a08s3/1.jpg','files/a08s3/2.jpg','files/a08s3/3.jpg','files/a08s3/4.jpg','files/a08s3/5.jpg','files/a08s3/6.jpg','files/a08s3/7.jpg','files/a08s3/8.jpg'], specs: { 'Объем': '0.8 л', 'Мощность': '52 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Компактный и экономичный двигатель для городских автомобилей.' },
+            { id: 20, name: 'F16D3', price: 139000, manufacturer: 'General Motors', applications: ['Chevrolet Lacetti', 'Chevrolet Aveo', 'Daewoo Nexia'], gallery: ['files/f16d3/1.jpg','files/f16d3/2.jpg','files/f16d3/3.jpg','files/f16d3/4.jpg','files/f16d3/5.jpg','files/f16d3/6.jpg','files/f16d3/7.jpg','files/f16d3/8.jpg','files/f16d3/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Массовый и хорошо изученный двигатель, являющийся развитием моторов Opel.' },
+            { id: 21, name: 'F16D4', price: 139000, manufacturer: 'General Motors', applications: ['Chevrolet Cruze', 'Chevrolet Aveo'], gallery: ['files/f16d4/1.jpg','files/f16d4/2.jpg','files/f16d4/3.jpg','files/f16d4/4.jpg','files/f16d4/5.jpg','files/f16d4/6.jpg','files/f16d4/7.jpg','files/f16d4/8.jpg','files/f16d4/9.jpg','files/f16d4/10.jpg','files/f16d4/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '113 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Более современный двигатель семейства Ecotec с фазорегуляторами.' },
+            { id: 22, name: 'F8CV', price: 89000, manufacturer: 'General Motors', applications: ['Daewoo Matiz', 'Chevrolet Spark'], gallery: ['files/f8cv/1.jpg','files/f8cv/2.jpg','files/f8cv/3.jpg','files/f8cv/4.jpg','files/f8cv/5.jpg','files/f8cv/6.jpg','files/f8cv/7.jpg','files/f8cv/8.jpg','files/f8cv/9.jpg','files/f8cv/10.jpg','files/f8cv/11.jpg'], specs: { 'Объем': '0.8 л', 'Мощность': '52 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Аналог A08S3, надежный двигатель для компактных автомобилей.' },
+            // Mitsubishi
+            { id: 23, name: '4A91', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Colt', 'Mitsubishi Lancer'], gallery: ['files/4a91/1.jpg','files/4a91/2.jpg','files/4a91/3.jpg','files/4a91/4.jpg','files/4a91/5.jpg','files/4a91/6.jpg','files/4a91/7.jpg','files/4a91/8.jpg','files/4a91/9.jpg','files/4a91/10.jpg','files/4a91/11.jpg'], specs: { 'Объем': '1.5 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Надежный двигатель с цепным ГРМ, разработанный совместно с Daimler-Chrysler.' },
+            { id: 24, name: '4A92', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi ASX', 'Mitsubishi Lancer'], gallery: ['files/4a92/1.jpg','files/4a92/2.jpg','files/4a92/3.jpg','files/4a92/4.jpg','files/4a92/5.jpg','files/4a92/6.jpg','files/4a92/7.jpg','files/4a92/8.jpg','files/4a92/9.jpg','files/4a92/10.jpg','files/4a92/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '117 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель из семейства 4A9, устанавливался на популярные кроссоверы и седаны.' },
+            { id: 25, name: '4G18', price: 110000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Lancer 9', 'Mitsubishi Carisma'], gallery: ['files/4g18/1.jpg','files/4g18/2.jpg','files/4g18/3.jpg','files/4g18/4.jpg','files/4g18/5.jpg','files/4g18/6.jpg','files/4g18/7.jpg','files/4g18/8.jpg','files/4g18/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '98 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Простой и очень надежный двигатель с ременным приводом ГРМ.' }
+        ];
+
+        const warehouseMedia = {
+            photos: [ `files/warehouse/11.jpg`, `files/warehouse/img_20250409_111137.jpg`, `files/warehouse/img_20250603_143128.jpg`, `files/warehouse/img_20250609_134622.jpg`, `files/warehouse/screenshot_34.png` ],
+            videos: [ { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзор+склада', videoUrl: 'files/warehouse/склад.mp4', title: 'Видеообзор нашего центрального склада' } ]
+        };
+        
+        const besfitsMedia = {
+            logo: 'files/besf1ts/logo.png',
+            photos: [ 'files/besf1ts/1.jpeg', 'files/besf1ts/2.jpeg', 'files/besf1ts/3.jpeg', 'files/besf1ts/4.jpeg' ],
+            video: 'files/besf1ts/besfits.mp4' // ИСПРАВЛЕНО: убран пробел
+        };
+
+        const cities = [ 'Астрахань', 'Волгоград', 'Воронеж', 'Екатеринбург', 'Ижевск', 'Казань', 'Краснодар', 'Магнитогорск', 'Махачкала', 'Москва', 'Набережные Челны', 'Нижневартовск', 'Нижний Новгород', 'Омск', 'Пермь', 'Ростов-на-Дону', 'Санкт-Петербург', 'Саратов', 'Сургут', 'Тверь', 'Тюмень', 'Уренгой', 'Уфа', 'Челябинск' ];
+        
+        // Остальной JavaScript код без изменений...
+        const catalogContainer = document.getElementById('catalog-container');
+        const modal = document.getElementById('engineModal');
+        const modalContent = document.getElementById('modalContent');
+        const purchaseModal = document.getElementById('purchaseModal');
+        const besfitsModal = document.getElementById('besfitsModal');
+        const besfitsModalContent = document.getElementById('besfitsModalContent');
+        const warehouseModal = document.getElementById('warehouseModal');
+        const lightboxModal = document.getElementById('lightboxModal');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const citiesDropdownBtn = document.getElementById('cities-dropdown-btn');
+        const citiesDropdown = document.getElementById('cities-dropdown');
+        const manufacturerNav = document.getElementById('manufacturer-nav');
+        const warehouseBtn = document.getElementById('warehouse-btn');
+        
+        const manufacturers = ['Hyundai / Kia', 'VAG', 'General Motors', 'Mitsubishi'];
+
+        let currentGallery = [];
+        let currentImageIndex = 0;
+        let touchstartX = 0;
+
+        function formatPrice(price) { return new Intl.NumberFormat('ru-RU').format(price) + ' ₽'; }
+
+        function renderManufacturerNav() {
+            manufacturerNav.innerHTML = '';
+            manufacturers.forEach(manufacturer => {
+                const anchorId = `manufacturer-${manufacturer.replace(/ \/ /g, '-').replace(/ /g, '-')}`;
+                const link = document.createElement('a');
+                link.href = `#${anchorId}`;
+                link.textContent = manufacturer;
+                link.className = 'px-3 py-2 text-sm font-semibold text-gray-700 rounded-md hover:bg-blue-600 hover:text-white transition-colors duration-200';
+                manufacturerNav.appendChild(link);
+            });
+        }
+
+        function renderEngineGroups() {
+            catalogContainer.innerHTML = '';
+            manufacturers.forEach(manufacturer => {
+                const groupEngines = engines.filter(engine => engine.manufacturer === manufacturer);
+                if (groupEngines.length === 0) return;
+
+                const groupContainer = document.createElement('div');
+                groupContainer.className = 'mb-16';
+                groupContainer.id = `manufacturer-${manufacturer.replace(/ \/ /g, '-').replace(/ /g, '-')}`;
+
+                const groupTitle = document.createElement('h2');
+                groupTitle.className = 'text-2xl font-bold mb-8 p-4 bg-blue-50 border border-blue-100 rounded-lg shadow text-gray-800';
+                groupTitle.textContent = manufacturer;
+                
+                const engineGrid = document.createElement('div');
+                engineGrid.className = 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4';
+
+                groupEngines.sort((a, b) => a.name.localeCompare(b.name)).forEach(engine => {
+                    const hasPhoto = engine.gallery && engine.gallery.length > 0;
+                    const mainImage = hasPhoto ? engine.gallery[0] : 'https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 flex flex-col cursor-pointer';
+                    card.setAttribute('onclick', `openModal(${engine.id})`);
+                    card.innerHTML = `
+                        <div class="relative w-full h-32 sm:h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
+                            <img src="${mainImage}" alt="${engine.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter';">
+                        </div>
+                        <div class="p-3 sm:p-4 flex flex-col flex-grow">
+                            <h3 class="text-base sm:text-lg font-semibold mb-1 truncate">${engine.name}</h3>
+                            <p class="text-sm text-gray-600 mb-2 hidden sm:block">${engine.manufacturer}</p>
+                            <p class="text-lg sm:text-xl font-bold text-blue-700">${formatPrice(engine.price)}</p>
+                            <button onclick="showPurchaseInfo(event); event.stopPropagation();" class="mt-auto w-full bg-green-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm mt-3">
+                                Купить
+                            </button>
+                        </div>
+                    `;
+                    engineGrid.appendChild(card);
+                });
+                groupContainer.appendChild(groupTitle);
+                groupContainer.appendChild(engineGrid);
+                catalogContainer.appendChild(groupContainer);
+            });
+        }
+
+        function renderCitiesDropdown() {
+            citiesDropdown.innerHTML = '';
+            cities.sort().forEach(city => {
+                const isCentral = city === 'Челябинск';
+                const cityText = isCentral ? 'Челябинск (центральный склад)' : city;
+                const cityEl = document.createElement('a');
+                cityEl.href = '#';
+                cityEl.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition-colors duration-150';
+                if (isCentral) { cityEl.classList.add('font-bold', 'bg-blue-50'); }
+                cityEl.textContent = cityText;
+                citiesDropdown.appendChild(cityEl);
+            });
+        }
+        
+        function updateGalleryImage() {
+            const imgElement = document.getElementById('gallery-image');
+            const counterElement = document.getElementById('gallery-counter');
+            if (imgElement && currentGallery.length > 0) {
+                imgElement.src = currentGallery[currentImageIndex];
+                counterElement.textContent = `Фото ${currentImageIndex + 1} из ${currentGallery.length}`;
+            }
+        }
+
+        function changeGalleryImage(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex >= currentGallery.length) { currentImageIndex = 0; }
+            if (currentImageIndex < 0) { currentImageIndex = currentGallery.length - 1; }
+            updateGalleryImage();
+        }
+
+        function openModal(engineId) {
+            const engine = engines.find(e => e.id === engineId);
+            if (!engine) return;
+
+            currentGallery = engine.gallery || [];
+            currentImageIndex = 0;
+
+            let galleryHtml = '';
+            if (currentGallery.length > 0) {
+                galleryHtml = `
+                    <div id="modal-gallery-container" class="relative overflow-hidden group" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event, 'modal')">
+                        <img id="gallery-image" src="${currentGallery[0]}" class="w-full h-64 md:h-full object-cover rounded-md shadow-sm cursor-pointer" alt="Фото ${engine.name}" onclick="openLightbox(currentGallery, 0)">
+                        <div id="gallery-counter" class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">Фото 1 из ${currentGallery.length}</div>
+                        <div class="gallery-arrow left opacity-0 md:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(-1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
+                        <div class="gallery-arrow right opacity-0 md:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
+                    </div>`;
+            } else {
+                 galleryHtml = `<div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center rounded-md overflow-hidden"><img src="https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter" alt="GammaMotors" class="w-full h-full object-cover"></div>`;
+            }
+            
+            const specsHtml = Object.entries(engine.specs).map(([key, value]) => `<div class="flex justify-between py-2 border-b border-gray-200 text-sm"><span class="text-gray-600">${key}</span><span class="font-semibold text-right">${value}</span></div>`).join('');
+            const applicationsHtml = `<div class="p-4 bg-gray-50 rounded-lg"><h4 class="font-semibold mb-2 text-gray-800 flex items-center"><svg class="w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>Применяемость</h4><ul class="text-sm text-gray-700 space-y-1">${engine.applications.map(car => `<li>- ${car}</li>`).join('')}</ul></div>`;
+            
+            let besfitsPromoHtml = '';
+
+            if (engine.manufacturer === 'Hyundai / Kia') {
+                besfitsPromoHtml = `
+                    <div class="mt-4 p-4 rounded-lg border bg-gradient-to-tr from-blue-100 to-indigo-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow relative group" onclick="openBesfitsModal(event)">
+                        <div class="flex items-center">
+                            <svg class="h-8 w-8 text-blue-600 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                             <h5 class="font-bold text-gray-800 mr-2">Собрано на компонентах BESFITS</h5>
+                             <img src="${besfitsMedia.logo}" alt="BESFITS Logo" class="h-8">
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1 pl-11">Качество оригинала по доступной цене. <strong>Узнайте, почему это важно.</strong></p>
+                        <div class="absolute top-1/2 right-4 -translate-y-1/2 text-blue-400 group-hover:text-blue-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+                `;
+            } 
+
+            let hotStartHtml = '';
+            if ((engine.manufacturer === 'Hyundai / Kia' || engine.manufacturer === 'VAG') && engine.hotStartVideo) {
+                hotStartHtml = `
+                    <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                        <h4 class="font-semibold mb-2 text-yellow-800 flex items-center"><svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.52 2.232a1 1 0 011.085.642l1.68 5.17h5.17a1 1 0 01.643 1.086 38.6 38.6 0 01-2.28 10.125.999.999 0 01-.913.645H2.086a1 1 0 01-.913-.645A38.599 38.599 0 01-.113 9.13a1 1 0 01.643-1.086h5.17l1.68-5.17a1 1 0 011.085-.642h3.044zM9.462 8.93c.27-.27.27-.707 0-.979a.692.692 0 00-.979 0l-1.68 1.68a.692.692 0 000 .979l1.68 1.68a.692.692 0 00.979 0c.27-.27.27-.707 0-.979L8.49 10.32l.972-.972zm1.06-2.652c.27-.27.707-.27.979 0l1.68 1.68a.692.692 0 010 .979l-1.68 1.68a.692.692 0 01-.979 0c-.27-.27-.27-.707 0-.979l.972-.972-.972-.972z" clip-rule="evenodd" /></svg>Проверка "Горячего Запуска"</h4>
+                        <p class="text-sm text-yellow-700 mb-3">Видео заводской проверки доступно по запросу и привязано к уникальному номеру двигателя.</p>
+                         <video controls preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onloadeddata="this.poster=''" onerror="this.style.display='none'; this.parentElement.querySelector('p').textContent = 'Видео для этой модели скоро будет добавлено.'">
+                            <source src="${engine.hotStartVideo}" type="video/mp4">
+                        </video>
+                    </div>
+                `;
+            }
+
+            modalContent.innerHTML = `
+                <div class="md:grid md:grid-cols-2 md:h-screen">
+                    <!-- Левая часть: Галерея -->
+                    <div class="md:sticky md:top-0 md:h-screen bg-black flex items-center justify-center">
+                        ${galleryHtml}
+                    </div>
+
+                    <!-- Правая часть: Информация -->
+                    <div class="p-6 md:p-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-bold">${engine.name}</h2>
+                                <p class="text-md text-gray-500">${engine.manufacturer}</p>
+                            </div>
+                            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-800 text-4xl">&times;</button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <p class="text-3xl font-bold text-blue-700">${formatPrice(engine.price)}</p>
+                                <button onclick="showPurchaseInfo(event)" class="mt-3 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-300 text-lg">
+                                    <svg class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                    Связаться для покупки
+                                </button>
+                            </div>
+
+                            ${besfitsPromoHtml}
+
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-semibold mb-2 text-gray-800 flex items-center"><svg class="w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M12 8h.01M15 8h.01M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>Характеристики</h4>
+                                <div class="space-y-1">${specsHtml}</div>
+                            </div>
+                            
+                            ${engine.applications && engine.applications.length > 0 ? applicationsHtml : ''}
+                            
+                            ${hotStartHtml}
+
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.style.overflow = 'hidden';
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
+        }
+        
+        function closeModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
+        }
+        
+        function showPurchaseInfo(event) {
+            event.stopPropagation();
+            purchaseModal.classList.remove('hidden');
+            setTimeout(() => { purchaseModal.classList.remove('opacity-0'); purchaseModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
+        }
+
+        function closePurchaseInfo() {
+            purchaseModal.classList.add('opacity-0');
+            purchaseModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => { purchaseModal.classList.add('hidden'); }, 300);
+        }
+        
+        function renderBesfitsModal() {
+            const logoImg = besfitsMedia.logo ? `<img src="${besfitsMedia.logo}" alt="BESFITS Logo" class="h-16 mr-6">` : '';
+            
+            let photosHtml = '<p class="text-gray-500 italic">Фотографии маркировок скоро будут добавлены.</p>';
+            if (besfitsMedia.photos && besfitsMedia.photos.length > 0) {
+                photosHtml = besfitsMedia.photos.map((src, index) => `
+                    <div class="cursor-pointer" onclick="openLightbox(besfitsMedia.photos, ${index})">
+                        <img src="${src}" class="w-full h-32 object-cover rounded-lg shadow hover:shadow-xl transition-shadow" alt="Маркировка BESFITS">
+                    </div>
+                `).join('');
+            }
+            
+            let videoHtml = '<div class="bg-black text-white rounded-lg h-48 flex items-center justify-center"><span class="italic">Видео скоро будет добавлено</span></div>';
+            if (besfitsMedia.video) {
+                videoHtml = `
+                    <video controls preload="metadata" class="w-full rounded-lg shadow" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''">
+                        <source src="${besfitsMedia.video}" type="video/mp4">
+                        Ваш браузер не поддерживает это видео.
+                    </video>
+                `;
+            }
+
+            besfitsModalContent.innerHTML = `
+                <button onclick="closeBesfitsModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl z-10">&times;</button>
+                <div class="flex items-center mb-4">
+                    ${logoImg}
+                    <h3 class="text-3xl font-bold text-blue-700">Что такое BESFITS?</h3>
+                </div>
+                <p class="text-gray-600 mb-6">Качество оригинала по доступной цене.</p>
+                <div class="space-y-4 text-gray-800">
+                    <p><strong>BESFITS</strong> – это специальная линейка запчастей, разработанная компанией <strong>MOBIS</strong>, которая является официальным и единственным поставщиком оригинальных комплектующих для <strong>HYUNDAI и KIA</strong>.</p>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <h4 class="font-semibold text-lg mb-2">Ключевые преимущества BESFITS:</h4>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong>Высочайшее качество:</strong> Детали производятся на тех же заводах MOBIS и по тем же технологиям, что и оригинальные запчасти ("Genuine Parts").</li>
+                            <li><strong>Умеренная цена:</strong> Вы получаете качество оригинала без переплаты за брендированную упаковку.</li>
+                            <li><strong>Полная совместимость:</strong> Гарантия идеальной работы с вашим автомобилем.</li>
+                            <li><strong>Надежность от MOBIS:</strong> За брендом стоит крупнейший производитель комплектующих в Корее.</li>
+                        </ul>
+                    </div>
+                </div>
+                 <div class="mt-8 pt-6 border-t">
+                    <h4 class="font-semibold text-xl mb-4 text-center">Визуальные подтверждения качества</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="font-semibold text-center mb-2">Примеры маркировки</h5>
+                            <div class="grid grid-cols-2 gap-2">
+                                ${photosHtml}
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-center mb-2">Видеообзор маркировок</h5>
+                            ${videoHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function openBesfitsModal(event) {
+            event.stopPropagation();
+            renderBesfitsModal();
+            besfitsModal.classList.remove('hidden');
+            setTimeout(() => { besfitsModal.classList.remove('opacity-0'); besfitsModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeBesfitsModal() {
+            besfitsModal.classList.add('opacity-0');
+            besfitsModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => { besfitsModal.classList.add('hidden'); }, 300);
+        }
+        
+        function openWarehouseModal() {
+            renderWarehouseMedia();
+            document.body.style.overflow = 'hidden';
+            warehouseModal.classList.remove('hidden');
+            setTimeout(() => { warehouseModal.classList.remove('opacity-0'); warehouseModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeWarehouseModal() {
+            warehouseModal.classList.add('opacity-0');
+            warehouseModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => { warehouseModal.classList.add('hidden'); document.body.style.overflow = 'auto';}, 300);
+        }
+
+        // --- НОВЫЙ ЛАЙТБОКС С НАВИГАЦИЕЙ ---
+        function openLightbox(gallery, startIndex = 0) {
+            currentGallery = gallery;
+            currentImageIndex = startIndex;
+            updateLightboxImage();
+            lightboxModal.classList.remove('hidden');
+            setTimeout(() => lightboxModal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightboxModal.classList.add('opacity-0');
+            setTimeout(() => lightboxModal.classList.add('hidden'), 300);
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateLightboxImage() {
+            if(currentGallery.length > 0) {
+                lightboxImage.src = currentGallery[currentImageIndex];
+            }
+        }
+
+        function navigateLightbox(direction) {
+            event.stopPropagation();
+            currentImageIndex += direction;
+            if (currentImageIndex >= currentGallery.length) {
+                currentImageIndex = 0;
+            }
+            if (currentImageIndex < 0) {
+                currentImageIndex = currentGallery.length - 1;
+            }
+            updateLightboxImage();
+        }
+
+        // Обработка свайпов
+        function handleTouchStart(e, source = 'lightbox') {
+            if (e.touches.length === 1) { 
+                touchstartX = e.touches[0].clientX;
+            }
+        }
+
+        function handleTouchEnd(e, source = 'lightbox') {
+            if (e.changedTouches.length === 1) {
+                const touchendX = e.changedTouches[0].clientX;
+                const swipeThreshold = 50; 
+                if (touchendX < touchstartX - swipeThreshold) {
+                    source === 'lightbox' ? navigateLightbox(1) : changeGalleryImage(1);
+                }
+                if (touchendX > touchstartX + swipeThreshold) {
+                    source === 'lightbox' ? navigateLightbox(-1) : changeGalleryImage(-1);
+                }
+            }
+        }
+
+        // --- КОНЕЦ НОВОГО ЛАЙТБОКСА ---
+
+
+        modal.addEventListener('click', (event) => { if (event.target === modal) { closeModal(); } });
+        purchaseModal.addEventListener('click', (event) => { if (event.target === purchaseModal) { closePurchaseInfo(); } });
+        besfitsModal.addEventListener('click', (event) => { if (event.target === besfitsModal) { closeBesfitsModal(); } });
+        warehouseModal.addEventListener('click', (event) => { if (event.target === warehouseModal) { closeWarehouseModal(); } });
+        citiesDropdownBtn.addEventListener('click', (event) => { event.stopPropagation(); citiesDropdown.classList.toggle('hidden'); });
+        warehouseBtn.addEventListener('click', openWarehouseModal);
+        window.addEventListener('click', () => { if (!citiesDropdown.classList.contains('hidden')) { citiesDropdown.classList.add('hidden'); } });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderManufacturerNav();
+            renderEngineGroups();
+            renderCitiesDropdown();
+        });
+    </script>
+</body>
+</html>
+"
+I would like you to make the following edits to the selected code:
+* add a logo to the left of the GammaMotors name. The logo should be an engine icon in blue to match the text.
+* make the "Фото/Видео склада" button always visible, even on mobile.
+* increase the font size of the text for the buttons in the header
+
