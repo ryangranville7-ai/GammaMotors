@@ -55,22 +55,51 @@
                 opacity: 1; /* Always show arrows on touch devices */
             }
         }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        video:playing + .video-overlay {
+            opacity: 0;
+        }
+        /* Стили для скролла миниатюр */
+        .thumbnails-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .thumbnails-container::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+        .thumbnails-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen" oncontextmenu="return false;">
 
     <!-- Шапка сайта -->
     <header class="bg-white shadow-md sticky top-0 z-30">
         <div class="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">GammaMotors</h1>
+            <div class="flex items-center">
+                <svg class="w-8 h-8 text-blue-700 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+                <h1 class="text-3xl md:text-4xl font-bold text-blue-700">GammaMotors</h1>
+            </div>
             
             <div class="flex items-center space-x-2 md:space-x-4">
-                <button id="warehouse-btn" class="hidden md:flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                <button id="warehouse-btn" class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-sm md:text-base">
                     <svg class="w-5 h-5 mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                     Фото/Видео склада
                 </button>
                 <div class="relative">
-                    <button id="cities-dropdown-btn" class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                    <button id="cities-dropdown-btn" class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-sm md:text-base">
                         <svg class="w-5 h-5 mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
                         <span class="hidden md:inline">Наши склады</span>
                         <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
@@ -119,7 +148,7 @@
     
     <div id="warehouseModal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
         <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 p-8 relative">
-            <button onclick="closeWarehouseModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <button onclick="history.back()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
             <h3 class="text-3xl font-bold mb-6 text-center">Наши склады вживую</h3>
             <h4 class="text-xl font-semibold mb-4 border-l-4 border-blue-600 pl-3">Фотографии склада</h4>
             <div id="warehouse-photos" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8"></div>
@@ -129,7 +158,7 @@
     </div>
 
     <div id="lightboxModal" class="lightbox fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center p-4 z-50">
-        <div class="lightbox-content relative w-full h-full flex items-center justify-center" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+        <div class="lightbox-content relative w-full h-full flex items-center justify-center" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event, 'lightbox')">
             <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-5xl z-20">&times;</button>
             <div class="lightbox-arrow left" onclick="navigateLightbox(-1)"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
             <img id="lightboxImage" src="" class="max-w-[90vw] max-h-[90vh] object-contain z-10">
@@ -201,18 +230,23 @@
             // Mitsubishi
             { id: 23, name: '4A91', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Colt', 'Mitsubishi Lancer'], gallery: ['files/4a91/1.jpg','files/4a91/2.jpg','files/4a91/3.jpg','files/4a91/4.jpg','files/4a91/5.jpg','files/4a91/6.jpg','files/4a91/7.jpg','files/4a91/8.jpg','files/4a91/9.jpg','files/4a91/10.jpg','files/4a91/11.jpg'], specs: { 'Объем': '1.5 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Надежный двигатель с цепным ГРМ, разработанный совместно с Daimler-Chrysler.' },
             { id: 24, name: '4A92', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi ASX', 'Mitsubishi Lancer'], gallery: ['files/4a92/1.jpg','files/4a92/2.jpg','files/4a92/3.jpg','files/4a92/4.jpg','files/4a92/5.jpg','files/4a92/6.jpg','files/4a92/7.jpg','files/4a92/8.jpg','files/4a92/9.jpg','files/4a92/10.jpg','files/4a92/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '117 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель из семейства 4A9, устанавливался на популярные кроссоверы и седаны.' },
-            { id: 25, name: '4G18', price: 110000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Lancer 9', 'Mitsubishi Carisma'], gallery: ['files/4g18/1.jpg','files/4g18/2.jpg','files/4g18/3.jpg','files/4g18/4.jpg','files/4g18/5.jpg','files/4g18/6.jpg','files/4g18/7.jpg','files/4g18/8.jpg','files/4g18/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '98 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Простой и очень надежный двигатель с ременным приводом ГРМ.' }
+            { id: 25, name: '4G18', price: 110000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Lancer 9', 'Mitsubishi Carisma'], gallery: ['files/4g18/1.jpg','files/4g18/2.jpg','files/4g18/3.jpg','files/4g18/4.jpg','files/4g18/5.jpg','files/g18/6.jpg','files/4g18/7.jpg','files/4g18/8.jpg','files/4g18/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '98 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Простой и очень надежный двигатель с ременным приводом ГРМ.' }
         ];
 
         const warehouseMedia = {
-            photos: [ `files/warehouse/11.jpg`, `files/warehouse/img_20250409_111137.jpg`, `files/warehouse/img_20250603_143128.jpg`, `files/warehouse/img_20250609_134622.jpg`, `files/warehouse/screenshot_34.png` ],
-            videos: [ { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзор+склада', videoUrl: 'files/warehouse/склад.mp4', title: 'Видеообзор нашего центрального склада' } ]
+            photos: [ `files/warehouse/1.jpg`, `files/warehouse/2.jpg`, `files/warehouse/3.jpg`, `files/warehouse/4.jpg`, `files/warehouse/5.jpg`, `files/warehouse/6.png` ],
+            videos: [ 
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзор+склада', videoUrl: 'files/warehouse/sklad.mp4', title: 'Видеообзор склада' },
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+отгрузки', videoUrl: 'files/warehouse/otgruzka.mp4', title: 'Процесс отгрузки' },
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+отправки', videoUrl: 'files/warehouse/otpravka.mp4', title: 'Подготовка к отправке' },
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+о+компании', videoUrl: 'files/warehouse/gamma_motors.mp4', title: 'О нашей компании' }
+            ]
         };
         
         const besfitsMedia = {
             logo: 'files/besf1ts/logo.png',
             photos: [ 'files/besf1ts/1.jpeg', 'files/besf1ts/2.jpeg', 'files/besf1ts/3.jpeg', 'files/besf1ts/4.jpeg' ],
-            video: 'files/besf1ts/besfits.mp4' // ИСПРАВЛЕНО: убран пробел
+            video: 'files/besf1ts/besfits.mp4'
         };
 
         const cities = [ 'Астрахань', 'Волгоград', 'Воронеж', 'Екатеринбург', 'Ижевск', 'Казань', 'Краснодар', 'Магнитогорск', 'Махачкала', 'Москва', 'Набережные Челны', 'Нижневартовск', 'Нижний Новгород', 'Омск', 'Пермь', 'Ростов-на-Дону', 'Санкт-Петербург', 'Саратов', 'Сургут', 'Тверь', 'Тюмень', 'Уренгой', 'Уфа', 'Челябинск' ];
@@ -234,9 +268,13 @@
         
         const manufacturers = ['Hyundai / Kia', 'VAG', 'General Motors', 'Mitsubishi'];
 
-        let currentGallery = [];
-        let currentImageIndex = 0;
-        let touchstartX = 0;
+        let currentModalGallery = [];
+        let currentModalImageIndex = 0;
+
+        let lightboxGallery = [];
+        let lightboxImageIndex = 0;
+        let lightboxTouchStartX = 0;
+
 
         function formatPrice(price) { return new Intl.NumberFormat('ru-RU').format(price) + ' ₽'; }
 
@@ -311,37 +349,69 @@
             });
         }
         
-        function updateGalleryImage() {
+        function updateModalGallery() {
             const imgElement = document.getElementById('gallery-image');
             const counterElement = document.getElementById('gallery-counter');
-            if (imgElement && currentGallery.length > 0) {
-                imgElement.src = currentGallery[currentImageIndex];
-                counterElement.textContent = `Фото ${currentImageIndex + 1} из ${currentGallery.length}`;
+            const thumbnails = document.querySelectorAll('.thumbnail-item');
+            if (imgElement && currentModalGallery.length > 0) {
+                imgElement.src = currentModalGallery[currentModalImageIndex];
+                counterElement.textContent = `Фото ${currentModalImageIndex + 1} из ${currentModalGallery.length}`;
+
+                thumbnails.forEach((thumb, index) => {
+                    thumb.classList.toggle('border-blue-500', index === currentModalImageIndex);
+                    thumb.classList.toggle('border-transparent', index !== currentModalImageIndex);
+                });
+                
+                const activeThumb = thumbnails[currentModalImageIndex];
+                if (activeThumb) {
+                    activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
             }
         }
 
-        function changeGalleryImage(direction) {
-            currentImageIndex += direction;
-            if (currentImageIndex >= currentGallery.length) { currentImageIndex = 0; }
-            if (currentImageIndex < 0) { currentImageIndex = currentGallery.length - 1; }
-            updateGalleryImage();
+        function changeModalGalleryImage(direction) {
+            currentModalImageIndex += direction;
+            if (currentModalImageIndex >= currentModalGallery.length) { currentModalImageIndex = 0; }
+            if (currentModalImageIndex < 0) { currentModalImageIndex = currentModalGallery.length - 1; }
+            updateModalGallery();
+        }
+
+        function setModalGalleryImage(index) {
+            currentModalImageIndex = index;
+            updateModalGallery();
         }
 
         function openModal(engineId) {
             const engine = engines.find(e => e.id === engineId);
             if (!engine) return;
 
-            currentGallery = engine.gallery || [];
-            currentImageIndex = 0;
+            currentModalGallery = engine.gallery || [];
+            currentModalImageIndex = 0;
+            
+            let thumbnailsHtml = '';
+            if (currentModalGallery.length > 1) {
+                thumbnailsHtml = `
+                <div class="thumbnails-container flex space-x-2 p-2 bg-black bg-opacity-20 overflow-x-auto mt-2 rounded-b-md">
+                    ${currentModalGallery.map((src, index) => `
+                        <img src="${src}" class="thumbnail-item w-16 h-16 object-cover rounded-md cursor-pointer border-2 ${index === 0 ? 'border-blue-500' : 'border-transparent'}" onclick="event.stopPropagation(); setModalGalleryImage(${index})">
+                    `).join('')}
+                </div>
+                `;
+            }
 
             let galleryHtml = '';
-            if (currentGallery.length > 0) {
+            if (currentModalGallery.length > 0) {
                 galleryHtml = `
                     <div id="modal-gallery-container" class="relative overflow-hidden group" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event, 'modal')">
-                        <img id="gallery-image" src="${currentGallery[0]}" class="w-full h-64 md:h-full object-cover rounded-md shadow-sm cursor-pointer" alt="Фото ${engine.name}" onclick="openLightbox(currentGallery, 0)">
-                        <div id="gallery-counter" class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">Фото 1 из ${currentGallery.length}</div>
-                        <div class="gallery-arrow left opacity-0 md:group-hover:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(-1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
-                        <div class="gallery-arrow right opacity-0 md:group-hover:opacity-100" onclick="event.stopPropagation(); changeGalleryImage(1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
+                        <div class="relative">
+                            <img id="gallery-image" src="${currentModalGallery[0]}" class="w-full h-64 md:h-auto md:aspect-[4/3] object-cover rounded-t-md shadow-sm cursor-pointer" alt="Фото ${engine.name}" onclick="openLightbox(currentModalGallery, 0)">
+                            <div id="gallery-counter" class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">Фото 1 из ${currentModalGallery.length}</div>
+                            ${currentModalGallery.length > 1 ? `
+                            <div class="gallery-arrow left" onclick="event.stopPropagation(); changeModalGalleryImage(-1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></div>
+                            <div class="gallery-arrow right" onclick="event.stopPropagation(); changeModalGalleryImage(1)"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></div>
+                            ` : ''}
+                        </div>
+                         ${thumbnailsHtml}
                     </div>`;
             } else {
                  galleryHtml = `<div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center rounded-md overflow-hidden"><img src="https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter" alt="GammaMotors" class="w-full h-full object-cover"></div>`;
@@ -357,16 +427,26 @@
                     <div class="mt-4 p-4 rounded-lg border bg-gradient-to-tr from-blue-100 to-indigo-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow relative group" onclick="openBesfitsModal(event)">
                         <div class="flex items-center">
                             <svg class="h-8 w-8 text-blue-600 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                             <h5 class="font-bold text-gray-800 mr-2">Собрано на компонентах BESFITS</h5>
+                             <h5 class="font-bold text-gray-800 mr-2">На оригинальных корейских компонентах BESFITS</h5>
                              <img src="${besfitsMedia.logo}" alt="BESFITS Logo" class="h-8">
                         </div>
-                        <p class="text-sm text-gray-600 mt-1 pl-11">Качество оригинала по доступной цене. <strong>Узнайте, почему это важно.</strong></p>
+                        <p class="text-sm text-gray-600 mt-1 pl-11"><strong>100% оригинальные компоненты</strong> от официального поставщика Hyundai/Kia. <strong>Узнайте, почему это важно.</strong></p>
                         <div class="absolute top-1/2 right-4 -translate-y-1/2 text-blue-400 group-hover:text-blue-600 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </div>
                     </div>
                 `;
-            } 
+            } else {
+                 besfitsPromoHtml = `
+                    <div class="mt-4 p-4 rounded-lg border bg-gradient-to-tr from-green-50 to-green-100 shadow-sm">
+                        <div class="flex items-center">
+                            <svg class="h-8 w-8 text-green-600 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <h5 class="font-bold text-gray-800">Сборка на оригинальных комплектующих</h5>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1 pl-11">Каждый двигатель собирается с использованием <strong>только оригинальных заводских компонентов</strong>, что гарантирует идеальную совместимость и максимальный ресурс работы.</p>
+                    </div>
+                 `;
+            }
 
             let hotStartHtml = '';
             if ((engine.manufacturer === 'Hyundai / Kia' || engine.manufacturer === 'VAG') && engine.hotStartVideo) {
@@ -374,17 +454,20 @@
                     <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
                         <h4 class="font-semibold mb-2 text-yellow-800 flex items-center"><svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.52 2.232a1 1 0 011.085.642l1.68 5.17h5.17a1 1 0 01.643 1.086 38.6 38.6 0 01-2.28 10.125.999.999 0 01-.913.645H2.086a1 1 0 01-.913-.645A38.599 38.599 0 01-.113 9.13a1 1 0 01.643-1.086h5.17l1.68-5.17a1 1 0 011.085-.642h3.044zM9.462 8.93c.27-.27.27-.707 0-.979a.692.692 0 00-.979 0l-1.68 1.68a.692.692 0 000 .979l1.68 1.68a.692.692 0 00.979 0c.27-.27.27-.707 0-.979L8.49 10.32l.972-.972zm1.06-2.652c.27-.27.707-.27.979 0l1.68 1.68a.692.692 0 010 .979l-1.68 1.68a.692.692 0 01-.979 0c-.27-.27-.27-.707 0-.979l.972-.972-.972-.972z" clip-rule="evenodd" /></svg>Проверка "Горячего Запуска"</h4>
                         <p class="text-sm text-yellow-700 mb-3">Видео заводской проверки доступно по запросу и привязано к уникальному номеру двигателя.</p>
-                         <video controls preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onloadeddata="this.poster=''" onerror="this.style.display='none'; this.parentElement.querySelector('p').textContent = 'Видео для этой модели скоро будет добавлено.'">
-                            <source src="${engine.hotStartVideo}" type="video/mp4">
-                        </video>
+                        <div class="relative">
+                            <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.display='none'" onpause="this.nextElementSibling.style.display='flex'" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-yellow-700\'>Видео для этой модели скоро будет добавлено.</p>';">
+                                <source src="${engine.hotStartVideo}" type="video/mp4">
+                            </video>
+                            <div class="video-overlay"><svg class="w-16 h-16 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>
+                        </div>
                     </div>
                 `;
             }
 
             modalContent.innerHTML = `
-                <div class="md:grid md:grid-cols-2 md:h-screen">
+                <div class="md:grid md:grid-cols-2">
                     <!-- Левая часть: Галерея -->
-                    <div class="md:sticky md:top-0 md:h-screen bg-black flex items-center justify-center">
+                    <div class="md:sticky md:top-0 md:h-screen bg-black flex flex-col items-center justify-center">
                         ${galleryHtml}
                     </div>
 
@@ -395,7 +478,7 @@
                                 <h2 class="text-2xl md:text-3xl font-bold">${engine.name}</h2>
                                 <p class="text-md text-gray-500">${engine.manufacturer}</p>
                             </div>
-                            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-800 text-4xl">&times;</button>
+                            <button onclick="history.back()" class="text-gray-500 hover:text-gray-800 text-4xl">&times;</button>
                         </div>
 
                         <div class="space-y-6">
@@ -423,6 +506,7 @@
                 </div>
             `;
             
+            history.pushState({modal: 'engine'}, ``, `#${engine.name}`);
             document.body.style.overflow = 'hidden';
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
@@ -436,6 +520,7 @@
         
         function showPurchaseInfo(event) {
             event.stopPropagation();
+            history.pushState({modal: 'purchase'}, '', '#purchase');
             purchaseModal.classList.remove('hidden');
             setTimeout(() => { purchaseModal.classList.remove('opacity-0'); purchaseModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
         }
@@ -461,15 +546,18 @@
             let videoHtml = '<div class="bg-black text-white rounded-lg h-48 flex items-center justify-center"><span class="italic">Видео скоро будет добавлено</span></div>';
             if (besfitsMedia.video) {
                 videoHtml = `
-                    <video controls preload="metadata" class="w-full rounded-lg shadow" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''">
-                        <source src="${besfitsMedia.video}" type="video/mp4">
-                        Ваш браузер не поддерживает это видео.
-                    </video>
+                    <div class="relative">
+                        <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.display='none'" onpause="this.nextElementSibling.style.display='flex'">
+                            <source src="${besfitsMedia.video}" type="video/mp4">
+                            Ваш браузер не поддерживает это видео.
+                        </video>
+                        <div class="video-overlay"><svg class="w-16 h-16 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>
+                    </div>
                 `;
             }
 
             besfitsModalContent.innerHTML = `
-                <button onclick="closeBesfitsModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl z-10">&times;</button>
+                <button onclick="history.back()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl z-10">&times;</button>
                 <div class="flex items-center mb-4">
                     ${logoImg}
                     <h3 class="text-3xl font-bold text-blue-700">Что такое BESFITS?</h3>
@@ -507,6 +595,7 @@
         
         function openBesfitsModal(event) {
             event.stopPropagation();
+            history.pushState({modal: 'besfits'}, '', '#besfits');
             renderBesfitsModal();
             besfitsModal.classList.remove('hidden');
             setTimeout(() => { besfitsModal.classList.remove('opacity-0'); besfitsModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
@@ -519,6 +608,7 @@
         }
         
         function openWarehouseModal() {
+            history.pushState({modal: 'warehouse'}, '', '#warehouse');
             renderWarehouseMedia();
             document.body.style.overflow = 'hidden';
             warehouseModal.classList.remove('hidden');
@@ -533,9 +623,10 @@
 
         // --- НОВЫЙ ЛАЙТБОКС С НАВИГАЦИЕЙ ---
         function openLightbox(gallery, startIndex = 0) {
-            currentGallery = gallery;
-            currentImageIndex = startIndex;
+            lightboxGallery = gallery;
+            lightboxImageIndex = startIndex;
             updateLightboxImage();
+            history.pushState({modal: 'lightbox'}, '', '#lightbox');
             lightboxModal.classList.remove('hidden');
             setTimeout(() => lightboxModal.classList.remove('opacity-0'), 10);
             document.body.style.overflow = 'hidden';
@@ -548,19 +639,19 @@
         }
 
         function updateLightboxImage() {
-            if(currentGallery.length > 0) {
-                lightboxImage.src = currentGallery[currentImageIndex];
+            if(lightboxGallery.length > 0) {
+                lightboxImage.src = lightboxGallery[lightboxImageIndex];
             }
         }
 
         function navigateLightbox(direction) {
             event.stopPropagation();
-            currentImageIndex += direction;
-            if (currentImageIndex >= currentGallery.length) {
-                currentImageIndex = 0;
+            lightboxImageIndex += direction;
+            if (lightboxImageIndex >= lightboxGallery.length) {
+                lightboxImageIndex = 0;
             }
-            if (currentImageIndex < 0) {
-                currentImageIndex = currentGallery.length - 1;
+            if (lightboxImageIndex < 0) {
+                lightboxImageIndex = lightboxGallery.length - 1;
             }
             updateLightboxImage();
         }
@@ -577,10 +668,10 @@
                 const touchendX = e.changedTouches[0].clientX;
                 const swipeThreshold = 50; 
                 if (touchendX < touchstartX - swipeThreshold) {
-                    source === 'lightbox' ? navigateLightbox(1) : changeGalleryImage(1);
+                    source === 'lightbox' ? navigateLightbox(1) : changeModalGalleryImage(1);
                 }
                 if (touchendX > touchstartX + swipeThreshold) {
-                    source === 'lightbox' ? navigateLightbox(-1) : changeGalleryImage(-1);
+                    source === 'lightbox' ? navigateLightbox(-1) : changeModalGalleryImage(-1);
                 }
             }
         }
@@ -628,12 +719,18 @@
                 }
             });
         }
+        
+        // --- ОБРАБОТКА КНОПКИ "НАЗАД" ---
+        window.addEventListener('popstate', (event) => {
+            closeModal();
+            closePurchaseInfo();
+            closeBesfitsModal();
+            closeWarehouseModal();
+            closeLightbox();
+        });
+
         // --- КОНЕЦ ЛОГИКИ НАВИГАЦИИ ---
 
-        modal.addEventListener('click', (event) => { if (event.target === modal) { closeModal(); } });
-        purchaseModal.addEventListener('click', (event) => { if (event.target === purchaseModal) { closePurchaseInfo(); } });
-        besfitsModal.addEventListener('click', (event) => { if (event.target === besfitsModal) { closeBesfitsModal(); } });
-        warehouseModal.addEventListener('click', (event) => { if (event.target === warehouseModal) { closeWarehouseModal(); } });
         citiesDropdownBtn.addEventListener('click', (event) => { event.stopPropagation(); citiesDropdown.classList.toggle('hidden'); });
         warehouseBtn.addEventListener('click', openWarehouseModal);
         window.addEventListener('click', () => { if (!citiesDropdown.classList.contains('hidden')) { citiesDropdown.classList.add('hidden'); } });
@@ -646,6 +743,7 @@
             handleScrollHighlight(); // Initial call
             window.addEventListener('resize', updateStickyNav);
             window.addEventListener('scroll', handleScrollHighlight);
+            history.replaceState(null, '', window.location.pathname); // Очищаем хэш при загрузке
         });
     </script>
 </body>
