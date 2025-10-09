@@ -98,10 +98,10 @@
                 <div class="relative">
                     <button id="cities-dropdown-btn" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold p-2 md:py-2 md:px-4 rounded-lg transition-colors duration-300">
                         <svg class="w-6 h-6 md:w-5 md:h-5 md:mr-2 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
-                        <span class="hidden md:inline">Наши склады</span>
+                        <span class="hidden md:inline">Наличие в городах</span>
                         <svg class="w-4 h-4 ml-2 hidden md:inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
                     </button>
-                    <div id="cities-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-xl z-20 max-h-80 overflow-y-auto"></div>
+                    <div id="cities-dropdown" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-md shadow-xl z-20 max-h-80 overflow-y-auto"></div>
                 </div>
             </div>
         </div>
@@ -119,10 +119,11 @@
     
     <div id="purchaseModal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
         <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-sm text-center p-8 relative transform scale-95">
-            <button onclick="closePurchaseInfo()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-            <h3 class="text-2xl font-bold mb-4">Оформление заказа</h3>
-            <p class="text-gray-700 mb-2">Для покупки двигателя, пожалуйста, свяжитесь с нашим менеджером:</p>
-            <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+            <button onclick="history.back()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Выберите способ покупки</h3>
+            
+            <div class="p-4 bg-gray-100 rounded-lg">
+                <p class="text-gray-700 mb-2">Связаться с менеджером для уточнения деталей и оформления заказа:</p>
                 <p class="text-xl font-semibold text-gray-900">Дамир</p>
                 <p class="text-3xl font-bold text-blue-700 my-3">8 (982) 306-69-54</p>
                 <div class="grid grid-cols-2 gap-3 mt-4">
@@ -136,6 +137,19 @@
                     </a>
                 </div>
             </div>
+
+            <div class="my-4 text-gray-500 text-sm font-semibold">ИЛИ</div>
+            
+            <button id="credit-info-btn" class="w-full bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-all duration-300 flex items-center justify-center text-lg">
+                <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 21z" /></svg>
+                Купить в кредит / рассрочку
+            </button>
+        </div>
+    </div>
+
+    <div id="creditModal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div id="creditModalContent" class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto transform scale-95 p-6 md:p-8 relative">
+            <!-- JS will generate content here -->
         </div>
     </div>
 
@@ -197,37 +211,37 @@
 
 
     <script>
-        // --- База данных (ОБНОВЛЕНО с учетом структуры ваших файлов) ---
+        // --- База данных ---
         const engines = [
              // Hyundai / Kia
-            { id: 1, name: 'G4EC', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Getz', 'Hyundai Verna', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4ec/hot_start.mp4', specs: { 'Объем': '1.5 л', 'Мощность': '102 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатели серии Alpha, к которой относится G4EC, известны своей простотой и надежностью.' },
-            { id: 2, name: 'G4ED', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Elantra', 'Hyundai Getz', 'Kia Cerato', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4ed/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '105 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатели серии Alpha II, являются развитием надежной серии Alpha.' },
-            { id: 3, name: 'G4EE', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Getz', 'Kia Rio'], gallery: ['files/g4ee/1.jpg','files/g4ee/2.jpg','files/g4ee/3.jpg','files/g4ee/4.jpg','files/g4ee/5.jpg','files/g4ee/6.jpg','files/g4ee/7.jpg','files/g4ee/8.jpg','files/g4ee/9.jpg'], hotStartVideo: 'files/g4ee/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '97 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4EE, часть серии Alpha II, устанавливался на популярные компактные модели.' },
-            { id: 4, name: 'G4FA', price: 115000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai i20', 'Kia Rio', 'Kia Ceed'], gallery: ['files/g4fa/1.jpg','files/g4fa/2.jpg','files/g4fa/3.jpg','files/g4fa/4.jpg','files/g4fa/5.jpg','files/g4fa/6.jpg','files/g4fa/7.jpg','files/g4fa/8.jpg','files/g4fa/9.jpg','files/g4fa/10.jpg','files/g4fa/11.jpg','files/g4fa/12.jpg','files/g4fa/13.jpg'], hotStartVideo: 'files/g4fa/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Серия Gamma, является одной из самых массовых и современных линеек двигателей компании.' },
-            { id: 5, name: 'G4FC', price: 115000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai Elantra', 'Hyundai Creta', 'Kia Rio', 'Kia Ceed'], gallery: ['files/g4fc/1.png','files/g4fc/2.png','files/g4fc/3.png','files/g4fc/4.png','files/g4fc/5.png','files/g4fc/6.png','files/g4fc/8.jpg','files/g4fc/9.jpg','files/g4fc/10.jpg','files/g4fc/11.jpg','files/g4fc/12.jpg','files/g4fc/13.jpg','files/g4fc/14.jpg'], hotStartVideo: 'files/g4fc/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '123 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'G4FC - один из самых популярных двигателей серии Gamma, устанавливался на миллионы автомобилей.' },
-            { id: 6, name: 'G4FD', price: 135000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Veloster', 'Hyundai Elantra', 'Kia Cerato', 'Kia Soul'], gallery: [], hotStartVideo: 'files/g4fd/hot_start.mp4', specs: { 'Объем': '1.6 л GDI', 'Мощность': '140 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4FD (Gamma GDI) оснащен непосредственным впрыском топлива.' },
-            { id: 7, name: 'G4FG', price: 125000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Hyundai Creta', 'Kia Ceed', 'Kia Soul'], gallery: ['files/g4fg/1.jpg','files/g4fg/2.jpg','files/g4fg/3.jpg','files/g4fg/4.jpg','files/g4fg/5.jpg','files/g4fg/6.jpg','files/g4fg/7.jpg','files/g4fg/8.jpg','files/g4fg/9.jpg','files/g4fg/10.jpg','files/g4fg/11.jpg'], hotStartVideo: 'files/g4fg/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '132 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'G4FG является обновленной версией G4FC с системой Dual CVVT.' },
-            { id: 8, name: 'G4KD', price: 185000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai ix35', 'Kia Sportage', 'Kia Optima'], gallery: ['files/g4kd/1.jpg','files/g4kd/2.jpg','files/g4kd/3.jpg','files/g4kd/4.jpg','files/g4kd/5.jpg','files/g4kd/6.jpg','files/g4kd/7.jpg','files/g4kd/8.jpg','files/g4kd/9.jpg','files/g4kd/10.jpg','files/g4kd/11.jpg','files/g4kd/12.jpg','files/g4kd/13.jpg','files/g4kd/14.jpg','files/g4kd/15.jpg','files/g4kd/16.jpg','files/g4kd/17.jpg','files/g4kd/18.jpg','files/g4kd/19.jpg'], hotStartVideo: 'files/g4kd/hot_start.mp4', specs: { 'Объем': '2.0 л', 'Мощность': '150-165 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Семейство Theta II, требует внимания к состоянию катализатора и ЦПГ.' },
-            { id: 9, name: 'G4KE', price: 185000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Sportage', 'Kia Sorento'], gallery: ['files/g4ke/1.jpg','files/g4ke/2.jpg','files/g4ke/3.jpg','files/g4ke/4.jpg','files/g4ke/5.jpg','files/g4ke/6.jpg','files/g4ke/7.jpg','files/g4ke/8.jpg','files/g4ke/9.jpg','files/g4ke/10.jpg','files/g4ke/11.jpg','files/g4ke/12.jpg','files/g4ke/13.jpg','files/g4ke/14.jpg','files/g4ke/15.jpg'], hotStartVideo: 'files/g4ke/hot_start.mp4', specs: { 'Объем': '2.4 л', 'Мощность': '175-180 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4KE (Theta II) является более объемной версией G4KD.' },
-            { id: 10, name: 'G4KJ New', price: 275000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Optima', 'Kia Sorento'], gallery: ['files/g4kj_new/1.jpg','files/g4kj_new/2.jpg','files/g4kj_new/3.jpg','files/g4kj_new/4.jpg','files/g4kj_new/5.jpg','files/g4kj_new/6.jpg'], hotStartVideo: 'files/g4kj_new/hot_start.mp4', specs: { 'Объем': '2.4 л GDI', 'Мощность': '188 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'G4KJ - это двигатель Theta II с непосредственным впрыском.' },
-            { id: 11, name: 'G4KJ Old', price: 175000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Optima', 'Kia Sorento'], gallery: ['files/g4kj_old/1.jpg','files/g4kj_old/2.jpg','files/g4kj_old/3.jpg','files/g4kj_old/4.jpg','files/g4kj_old/5.jpg','files/g4kj_old/6.jpg','files/g4kj_old/7.jpg','files/g4kj_old/8.jpg','files/g4kj_old/11.jpg','files/g4kj_old/13.jpg','files/g4kj_old/15.jpg','files/g4kj_old/16.jpg'], hotStartVideo: null, specs: { 'Объем': '2.4 л GDI', 'Мощность': '201 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Ранняя версия двигателя G4KJ, которая отличалась более высокой мощностью.' },
-            { id: 12, name: 'G4LC', price: 135000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai i20', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4lc/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '100 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Семейство Kappa, отличается меньшим весом и повышенной экономичностью.' },
-            { id: 13, name: 'G4NA', price: 165000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Hyundai ix35', 'Hyundai Creta', 'Kia Sportage'], gallery: ['files/g4na/1.jpg','files/g4na/2.jpg','files/g4na/3.jpg','files/g4na/4.jpg','files/g4na/5.jpg','files/g4na/6.jpg','files/g4na/7.jpg','files/g4na/8.jpg','files/g4na/9.jpg','files/g4na/10.jpg','files/g4na/12.jpg','files/g4na/13.jpg','files/g4na/14.jpg'], hotStartVideo: 'files/g4na/hot_start.mp4', specs: { 'Объем': '2.0 л', 'Мощность': '150 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Серия Nu, является современным и массовым двигателем, пришедшим на смену Theta II.' },
-            { id: 14, name: 'G4NB', price: 165000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Kia Cerato'], gallery: ['files/g4nb/1.jpg','files/g4nb/2.jpg','files/g4nb/3.jpg','files/g4nb/4.jpg'], hotStartVideo: 'files/g4nb/hot_start.mp4', specs: { 'Объем': '1.8 л', 'Мощность': '149 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель G4NB из серии Nu, устанавливался на такие автомобили как Hyundai Elantra.' },
+            { id: 1, name: 'G4EC', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Getz', 'Hyundai Verna', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4ec/hot_start.mp4', specs: { 'Объем': '1.5 л', 'Мощность': '102 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 2, name: 'G4ED', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Elantra', 'Hyundai Getz', 'Kia Cerato', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4ed/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '105 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 3, name: 'G4EE', price: 129000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Accent', 'Hyundai Getz', 'Kia Rio'], gallery: ['files/g4ee/1.jpg','files/g4ee/2.jpg','files/g4ee/3.jpg','files/g4ee/4.jpg','files/g4ee/5.jpg','files/g4ee/6.jpg','files/g4ee/7.jpg','files/g4ee/8.jpg','files/g4ee/9.jpg'], hotStartVideo: 'files/g4ee/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '97 л.с.', 'Тип топлива': 'Бензин' }, extraVideos: [{ url: 'files/g4ee/g4ee_obzor.mp4', title: 'Краткий видеообзор', description: 'Осмотр двигателя, эндоскопия цилиндров и проверка состояния.' }] },
+            { id: 4, name: 'G4FA', price: 115000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai i20', 'Kia Rio', 'Kia Ceed'], gallery: ['files/g4fa/1.jpg','files/g4fa/2.jpg','files/g4fa/3.jpg','files/g4fa/4.jpg','files/g4fa/5.jpg','files/g4fa/6.jpg','files/g4fa/7.jpg','files/g4fa/8.jpg','files/g4fa/9.jpg','files/g4fa/10.jpg','files/g4fa/11.jpg','files/g4fa/12.jpg','files/g4fa/13.jpg'], hotStartVideo: 'files/g4fa/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 5, name: 'G4FC', price: 115000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai Elantra', 'Hyundai Creta', 'Kia Rio', 'Kia Ceed'], gallery: ['files/g4fc/1.png','files/g4fc/2.png','files/g4fc/3.png','files/g4fc/4.png','files/g4fc/5.png','files/g4fc/6.png','files/g4fc/8.jpg','files/g4fc/9.jpg','files/g4fc/10.jpg','files/g4fc/11.jpg','files/g4fc/12.jpg','files/g4fc/13.jpg','files/g4fc/14.jpg'], hotStartVideo: 'files/g4fc/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '123 л.с.', 'Тип топлива': 'Бензин' }, extraVideos: [{ url: 'files/g4fc/g4fc_obzor.mp4', title: 'Краткий видеообзор', description: 'Осмотр двигателя, эндоскопия цилиндров и проверка состояния.' }] },
+            { id: 6, name: 'G4FD', price: 135000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Veloster', 'Hyundai Elantra', 'Kia Cerato', 'Kia Soul'], gallery: [], hotStartVideo: 'files/g4fd/hot_start.mp4', specs: { 'Объем': '1.6 л GDI', 'Мощность': '140 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 7, name: 'G4FG', price: 125000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Hyundai Creta', 'Kia Ceed', 'Kia Soul'], gallery: ['files/g4fg/1.jpg','files/g4fg/2.jpg','files/g4fg/3.jpg','files/g4fg/4.jpg','files/g4fg/5.jpg','files/g4fg/6.jpg','files/g4fg/7.jpg','files/g4fg/8.jpg','files/g4fg/9.jpg','files/g4fg/10.jpg','files/g4fg/11.jpg'], hotStartVideo: 'files/g4fg/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '132 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 8, name: 'G4KD', price: 185000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai ix35', 'Kia Sportage', 'Kia Optima'], gallery: ['files/g4kd/1.jpg','files/g4kd/2.jpg','files/g4kd/3.jpg','files/g4kd/4.jpg','files/g4kd/5.jpg','files/g4kd/6.jpg','files/g4kd/7.jpg','files/g4kd/8.jpg','files/g4kd/9.jpg','files/g4kd/10.jpg','files/g4kd/11.jpg','files/g4kd/12.jpg','files/g4kd/13.jpg','files/g4kd/14.jpg','files/g4kd/15.jpg','files/g4kd/16.jpg','files/g4kd/17.jpg','files/g4kd/18.jpg','files/g4kd/19.jpg'], hotStartVideo: 'files/g4kd/hot_start.mp4', specs: { 'Объем': '2.0 л', 'Мощность': '150-165 л.с.', 'Тип топлива': 'Бензин' }, extraVideos: [{ url: 'files/g4kd/g4kd_obzor.mp4', title: 'Краткий видеообзор', description: 'Осмотр двигателя и эндоскопия цилиндро-поршневой группы.' }, { url: 'files/g4kd/g4kd_masloforsunki.mp4', title: 'Установлены маслофорсунки', description: 'Важнейшая доработка для двигателей серии Theta-II. Маслофорсунки подают масло на дно поршня, охлаждая его и предотвращая появление задиров.' }] },
+            { id: 9, name: 'G4KE', price: 185000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Sportage', 'Kia Sorento'], gallery: ['files/g4ke/1.jpg','files/g4ke/2.jpg','files/g4ke/3.jpg','files/g4ke/4.jpg','files/g4ke/5.jpg','files/g4ke/6.jpg','files/g4ke/7.jpg','files/g4ke/8.jpg','files/g4ke/9.jpg','files/g4ke/10.jpg','files/g4ke/11.jpg','files/g4ke/12.jpg','files/g4ke/13.jpg','files/g4ke/14.jpg','files/g4ke/15.jpg'], hotStartVideo: 'files/g4ke/hot_start.mp4', specs: { 'Объем': '2.4 л', 'Мощность': '175-180 л.с.', 'Тип топлива': 'Бензин' }, extraVideos: [{ url: 'files/g4ke/g4ke_obzor.mp4', title: 'Краткий видеообзор', description: 'Осмотр двигателя и эндоскопия цилиндро-поршневой группы.' }, { url: 'files/g4ke/g4ke_masloforsunki.mp4', title: 'Установлены маслофорсунки', description: 'Ключевая доработка, которая решает проблему задиров в двигателях Theta-II, дополнительно охлаждая поршни.' }, { url: 'files/g4ke/g4ke_maslonasos.mp4', title: 'Доработанный маслонасос', description: 'Установка безбалансирного маслонасоса повышает давление в системе и общую надежность двигателя.' }] },
+            { id: 10, name: 'G4KJ New', price: 275000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Optima', 'Kia Sorento'], gallery: ['files/g4kj_new/1.jpg','files/g4kj_new/2.jpg','files/g4kj_new/3.jpg','files/g4kj_new/4.jpg','files/g4kj_new/5.jpg','files/g4kj_new/6.jpg'], hotStartVideo: 'files/g4kj_new/hot_start.mp4', specs: { 'Объем': '2.4 л GDI', 'Мощность': '188 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 11, name: 'G4KJ Old', price: 175000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Sonata', 'Hyundai Santa Fe', 'Kia Optima', 'Kia Sorento'], gallery: ['files/g4kj_old/1.jpg','files/g4kj_old/2.jpg','files/g4kj_old/3.jpg','files/g4kj_old/4.jpg','files/g4kj_old/5.jpg','files/g4kj_old/6.jpg','files/g4kj_old/7.jpg','files/g4kj_old/8.jpg','files/g4kj_old/11.jpg','files/g4kj_old/13.jpg','files/g4kj_old/15.jpg','files/g4kj_old/16.jpg'], hotStartVideo: null, specs: { 'Объем': '2.4 л GDI', 'Мощность': '201 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 12, name: 'G4LC', price: 135000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Solaris', 'Hyundai i20', 'Kia Rio'], gallery: [], hotStartVideo: 'files/g4lc/hot_start.mp4', specs: { 'Объем': '1.4 л', 'Мощность': '100 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 13, name: 'G4NA', price: 165000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Hyundai ix35', 'Hyundai Creta', 'Kia Sportage'], gallery: ['files/g4na/1.jpg','files/g4na/2.jpg','files/g4na/3.jpg','files/g4na/4.jpg','files/g4na/5.jpg','files/g4na/6.jpg','files/g4na/7.jpg','files/g4na/8.jpg','files/g4na/9.jpg','files/g4na/10.jpg','files/g4na/12.jpg','files/g4na/13.jpg','files/g4na/14.jpg'], hotStartVideo: 'files/g4na/hot_start.mp4', specs: { 'Объем': '2.0 л', 'Мощность': '150 л.с.', 'Тип топлива': 'Бензин' }, extraVideos: [{ url: 'files/g4na/g4na_obzor.mp4', title: 'Краткий видеообзор', description: 'Осмотр двигателя и эндоскопия цилиндро-поршневой группы.' }, { url: 'files/g4na/g4na_masloforsunki.mp4', title: 'Установлены маслофорсунки', description: 'Важная доработка для 2-литровых двигателей серии Nu, значительно продлевающая ресурс ЦПГ за счет дополнительного охлаждения поршней.' }] },
+            { id: 14, name: 'G4NB', price: 165000, manufacturer: 'Hyundai / Kia', applications: ['Hyundai Elantra', 'Kia Cerato'], gallery: ['files/g4nb/1.jpg','files/g4nb/2.jpg','files/g4nb/3.jpg','files/g4nb/4.jpg'], hotStartVideo: 'files/g4nb/hot_start.mp4', specs: { 'Объем': '1.8 л', 'Мощность': '149 л.с.', 'Тип топлива': 'Бензин' }},
             // VAG
-            { id: 15, name: 'CAV', price: 160000, manufacturer: 'VAG', applications: ['VW Golf', 'VW Tiguan', 'Skoda Fabia RS'], gallery: ['files/cav/1.jpg','files/cav/2.jpg','files/cav/3.jpg','files/cav/4.jpg','files/cav/5.jpg','files/cav/6.jpg','files/cav/7.jpg','files/cav/8.jpg','files/cav/9.jpg','files/cav/10.jpg','files/cav/11.jpg','files/cav/12.jpg','files/cav/13.jpg'], hotStartVideo: 'files/cav/hot_start.mp4', specs: { 'Объем': '1.4 л TSI', 'Мощность': '150-180 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель с двойным наддувом (турбина + компрессор) серии EA111.' },
-            { id: 16, name: 'CDA', price: 195000, manufacturer: 'VAG', applications: ['VW Passat', 'VW Tiguan', 'Skoda Octavia', 'Skoda Superb', 'Audi A3'], gallery: ['files/cda/1.jpg','files/cda/2.jpg','files/cda/3.jpg','files/cda/4.jpg','files/cda/5.jpg','files/cda/6.jpg','files/cda/7.jpg','files/cda/8.jpg','files/cda/9.jpg','files/cda/10.jpg','files/cda/11.jpg','files/cda/12.jpg','files/cda/13.jpg','files/cda/14.jpg'], hotStartVideo: 'files/cda/hot_start.mp4', specs: { 'Объем': '1.8 л TSI', 'Мощность': '152-160 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Популярный турбированный двигатель серии EA888 Gen2.' },
-            { id: 17, name: 'CFN', price: 125000, manufacturer: 'VAG', applications: ['VW Polo Sedan', 'VW Jetta', 'Skoda Fabia', 'Skoda Rapid'], gallery: ['files/cfn/1.jpg','files/cfn/2.jpg','files/cfn/3.jpg','files/cfn/4.jpg','files/cfn/5.jpg','files/cfn/6.jpg','files/cfn/7.jpg','files/cfn/8.jpg','files/cfn/9.jpg','files/cfn/10.jpg','files/cfn/11.jpg','files/cfn/12.jpg'], hotStartVideo: 'files/cfn/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '85-105 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Надежный атмосферный двигатель серии EA111, широко распространенный в России.' },
-            { id: 18, name: 'CWV', price: 145000, manufacturer: 'VAG', applications: ['VW Polo', 'VW Jetta', 'Skoda Rapid', 'Skoda Octavia'], gallery: ['files/cwv/1.jpg','files/cwv/2.jpg','files/cwv/3.jpg','files/cwv/4.jpg','files/cwv/5.jpg','files/cwv/6.jpg','files/cwv/7.jpg','files/cwv/8.jpg','files/cwv/9.jpg','files/cwv/10.jpg','files/cwv/11.jpg','files/cwv/12.jpg'], hotStartVideo: 'files/cwv/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '90-110 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Современный атмосферный двигатель серии EA211, пришедший на смену CFNA.' },
+            { id: 15, name: 'CAV', price: 160000, manufacturer: 'VAG', applications: ['VW Golf', 'VW Tiguan', 'Skoda Fabia RS'], gallery: ['files/cav/1.jpg','files/cav/2.jpg','files/cav/3.jpg','files/cav/4.jpg','files/cav/5.jpg','files/cav/6.jpg','files/cav/7.jpg','files/cav/8.jpg','files/cav/9.jpg','files/cav/10.jpg','files/cav/11.jpg','files/cav/12.jpg','files/cav/13.jpg'], hotStartVideo: 'files/cav/hot_start.mp4', specs: { 'Объем': '1.4 л TSI', 'Мощность': '150-180 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 16, name: 'CDA', price: 195000, manufacturer: 'VAG', applications: ['VW Passat', 'VW Tiguan', 'Skoda Octavia', 'Skoda Superb', 'Audi A3'], gallery: ['files/cda/1.jpg','files/cda/2.jpg','files/cda/3.jpg','files/cda/4.jpg','files/cda/5.jpg','files/cda/6.jpg','files/cda/7.jpg','files/cda/8.jpg','files/cda/9.jpg','files/cda/10.jpg','files/cda/11.jpg','files/cda/12.jpg','files/cda/13.jpg','files/cda/14.jpg'], hotStartVideo: 'files/cda/hot_start.mp4', specs: { 'Объем': '1.8 л TSI', 'Мощность': '152-160 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 17, name: 'CFN', price: 125000, manufacturer: 'VAG', applications: ['VW Polo Sedan', 'VW Jetta', 'Skoda Fabia', 'Skoda Rapid'], gallery: ['files/cfn/1.jpg','files/cfn/2.jpg','files/cfn/3.jpg','files/cfn/4.jpg','files/cfn/5.jpg','files/cfn/6.jpg','files/cfn/7.jpg','files/cfn/8.jpg','files/cfn/9.jpg','files/cfn/10.jpg','files/cfn/11.jpg','files/cfn/12.jpg'], hotStartVideo: 'files/cfn/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '85-105 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 18, name: 'CWV', price: 145000, manufacturer: 'VAG', applications: ['VW Polo', 'VW Jetta', 'Skoda Rapid', 'Skoda Octavia'], gallery: ['files/cwv/1.jpg','files/cwv/2.jpg','files/cwv/3.jpg','files/cwv/4.jpg','files/cwv/5.jpg','files/cwv/6.jpg','files/cwv/7.jpg','files/cwv/8.jpg','files/cwv/9.jpg','files/cwv/10.jpg','files/cwv/11.jpg','files/cwv/12.jpg'], hotStartVideo: 'files/cwv/hot_start.mp4', specs: { 'Объем': '1.6 л', 'Мощность': '90-110 л.с.', 'Тип топлива': 'Бензин' }},
             // General Motors
-            { id: 19, name: 'A08S3', price: 89000, manufacturer: 'General Motors', applications: ['Daewoo Matiz', 'Chevrolet Spark'], gallery: ['files/a08s3/1.jpg','files/a08s3/2.jpg','files/a08s3/3.jpg','files/a08s3/4.jpg','files/a08s3/5.jpg','files/a08s3/6.jpg','files/a08s3/7.jpg','files/a08s3/8.jpg'], specs: { 'Объем': '0.8 л', 'Мощность': '52 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Компактный и экономичный двигатель для городских автомобилей.' },
-            { id: 20, name: 'F16D3', price: 139000, manufacturer: 'General Motors', applications: ['Chevrolet Lacetti', 'Chevrolet Aveo', 'Daewoo Nexia'], gallery: ['files/f16d3/1.jpg','files/f16d3/2.jpg','files/f16d3/3.jpg','files/f16d3/4.jpg','files/f16d3/5.jpg','files/f16d3/6.jpg','files/f16d3/7.jpg','files/f16d3/8.jpg','files/f16d3/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Массовый и хорошо изученный двигатель, являющийся развитием моторов Opel.' },
-            { id: 21, name: 'F16D4', price: 139000, manufacturer: 'General Motors', applications: ['Chevrolet Cruze', 'Chevrolet Aveo'], gallery: ['files/f16d4/1.jpg','files/f16d4/2.jpg','files/f16d4/3.jpg','files/f16d4/4.jpg','files/f16d4/5.jpg','files/f16d4/6.jpg','files/f16d4/7.jpg','files/f16d4/8.jpg','files/f16d4/9.jpg','files/f16d4/10.jpg','files/f16d4/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '113 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Более современный двигатель семейства Ecotec с фазорегуляторами.' },
-            { id: 22, name: 'F8CV', price: 89000, manufacturer: 'General Motors', applications: ['Daewoo Matiz', 'Chevrolet Spark'], gallery: ['files/f8cv/1.jpg','files/f8cv/2.jpg','files/f8cv/3.jpg','files/f8cv/4.jpg','files/f8cv/5.jpg','files/f8cv/6.jpg','files/f8cv/7.jpg','files/f8cv/8.jpg','files/f8cv/9.jpg','files/f8cv/10.jpg','files/f8cv/11.jpg'], specs: { 'Объем': '0.8 л', 'Мощность': '52 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Аналог A08S3, надежный двигатель для компактных автомобилей.' },
+            { id: 19, name: 'A08S3', price: 89000, manufacturer: 'General Motors', applications: ['Daewoo Matiz', 'Chevrolet Spark'], gallery: ['files/a08s3/1.jpg','files/a08s3/2.jpg','files/a08s3/3.jpg','files/a08s3/4.jpg','files/a08s3/5.jpg','files/a08s3/6.jpg','files/a08s3/7.jpg','files/a08s3/8.jpg'], specs: { 'Объем': '0.8 л', 'Мощность': '52 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 20, name: 'F16D3', price: 139000, manufacturer: 'General Motors', applications: ['Chevrolet Lacetti', 'Chevrolet Aveo', 'Daewoo Nexia'], gallery: ['files/f16d3/1.jpg','files/f16d3/2.jpg','files/f16d3/3.jpg','files/f16d3/4.jpg','files/f16d3/5.jpg','files/f16d3/6.jpg','files/f16d3/7.jpg','files/f16d3/8.jpg','files/f16d3/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 21, name: 'F16D4', price: 139000, manufacturer: 'General Motors', applications: ['Chevrolet Cruze', 'Chevrolet Aveo'], gallery: ['files/f16d4/1.jpg','files/f16d4/2.jpg','files/f16d4/3.jpg','files/f16d4/4.jpg','files/f16d4/5.jpg','files/f16d4/6.jpg','files/f16d4/7.jpg','files/f16d4/8.jpg','files/f16d4/9.jpg','files/f16d4/10.jpg','files/f16d4/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '113 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 22, name: 'F8CV', price: 89000, manufacturer: 'General Motors', applications: ['Daewoo Matiz', 'Chevrolet Spark'], gallery: ['files/f8cv/1.jpg','files/f8cv/2.jpg','files/f8cv/3.jpg','files/f8cv/4.jpg','files/f8cv/5.jpg','files/f8cv/6.jpg','files/f8cv/7.jpg','files/f8cv/8.jpg','files/f8cv/9.jpg','files/f8cv/10.jpg','files/f8cv/11.jpg'], specs: { 'Объем': '0.8 л', 'Мощность': '52 л.с.', 'Тип топлива': 'Бензин' }},
             // Mitsubishi
-            { id: 23, name: '4A91', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Colt', 'Mitsubishi Lancer'], gallery: ['files/4a91/1.jpg','files/4a91/2.jpg','files/4a91/3.jpg','files/4a91/4.jpg','files/4a91/5.jpg','files/4a91/6.jpg','files/4a91/7.jpg','files/4a91/8.jpg','files/4a91/9.jpg','files/4a91/10.jpg','files/4a91/11.jpg'], specs: { 'Объем': '1.5 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Надежный двигатель с цепным ГРМ, разработанный совместно с Daimler-Chrysler.' },
-            { id: 24, name: '4A92', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi ASX', 'Mitsubishi Lancer'], gallery: ['files/4a92/1.jpg','files/4a92/2.jpg','files/4a92/3.jpg','files/4a92/4.jpg','files/4a92/5.jpg','files/4a92/6.jpg','files/4a92/7.jpg','files/4a92/8.jpg','files/4a92/9.jpg','files/4a92/10.jpg','files/4a92/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '117 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Двигатель из семейства 4A9, устанавливался на популярные кроссоверы и седаны.' },
-            { id: 25, name: '4G18', price: 110000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Lancer 9', 'Mitsubishi Carisma'], gallery: ['files/4g18/1.jpg','files/4g18/2.jpg','files/4g18/3.jpg','files/4g18/4.jpg','files/4g18/5.jpg','files/4g18/6.jpg','files/4g18/7.jpg','files/4g18/8.jpg','files/4g18/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '98 л.с.', 'Тип топлива': 'Бензин' }, manufacturerInfo: 'Простой и очень надежный двигатель с ременным приводом ГРМ.' }
+            { id: 23, name: '4A91', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Colt', 'Mitsubishi Lancer'], gallery: ['files/4a91/1.jpg','files/4a91/2.jpg','files/4a91/3.jpg','files/4a91/4.jpg','files/4a91/5.jpg','files/4a91/6.jpg','files/4a91/7.jpg','files/4a91/8.jpg','files/4a91/9.jpg','files/4a91/10.jpg','files/4a91/11.jpg'], specs: { 'Объем': '1.5 л', 'Мощность': '109 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 24, name: '4A92', price: 115000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi ASX', 'Mitsubishi Lancer'], gallery: ['files/4a92/1.jpg','files/4a92/2.jpg','files/4a92/3.jpg','files/4a92/4.jpg','files/4a92/5.jpg','files/4a92/6.jpg','files/4a92/7.jpg','files/4a92/8.jpg','files/4a92/9.jpg','files/4a92/10.jpg','files/4a92/11.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '117 л.с.', 'Тип топлива': 'Бензин' }},
+            { id: 25, name: '4G18', price: 110000, manufacturer: 'Mitsubishi', applications: ['Mitsubishi Lancer 9', 'Mitsubishi Carisma'], gallery: ['files/4g18/1.jpg','files/4g18/2.jpg','files/4g18/3.jpg','files/4g18/4.jpg','files/4g18/5.jpg','files/4g18/6.jpg','files/4g18/7.jpg','files/4g18/8.jpg','files/4g18/9.jpg'], specs: { 'Объем': '1.6 л', 'Мощность': '98 л.с.', 'Тип топлива': 'Бензин' }}
         ];
 
         const warehouseMedia = {
@@ -236,7 +250,10 @@
                 { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзор+склада', videoUrl: 'files/warehouse/sklad.mp4', title: 'Видеообзор склада' },
                 { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+отгрузки', videoUrl: 'files/warehouse/otgruzka.mp4', title: 'Процесс отгрузки' },
                 { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+отправки', videoUrl: 'files/warehouse/otpravka.mp4', title: 'Подготовка к отправке' },
-                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+о+компании', videoUrl: 'files/warehouse/gamma motors.mp4', title: 'О нашей компании' }
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Видео+о+компании', videoUrl: 'files/warehouse/gamma motors.mp4', title: 'О нашей компании' },
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Подготовка+ДВС', videoUrl: 'files/warehouse/podgotovka_dvs.mp4', title: 'Подготовка ДВС к отправке' },
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Привоз+партии', videoUrl: 'files/warehouse/privoz.mp4', title: 'Привоз новой партии' },
+                { thumbnail: 'https://placehold.co/1280x720/000000/FFFFFF?text=Новая+партия', videoUrl: 'files/warehouse/privoz_new_partya.mp4', title: 'Распаковка новой партии' }
             ]
         };
         
@@ -246,13 +263,14 @@
             video: 'files/besf1ts/besfits.mp4'
         };
 
-        const cities = [ 'Астрахань', 'Волгоград', 'Воронеж', 'Екатеринбург', 'Ижевск', 'Казань', 'Краснодар', 'Магнитогорск', 'Махачкала', 'Москва', 'Набережные Челны', 'Нижневартовск', 'Нижний Новгород', 'Омск', 'Пермь', 'Ростов-на-Дону', 'Санкт-Петербург', 'Саратов', 'Сургут', 'Тверь', 'Тюмень', 'Уренгой', 'Уфа', 'Челябинск' ];
+        const cities = [ 'Астрахань', 'Волгоград', 'Воронеж', 'Екатеринбург', 'Ижевск', 'Казань', 'Краснодар', 'Магнитогорск', 'Махачкала', 'Москва', 'Набережные Челны', 'Нижневартовск', 'Нижний Новгород', 'Омск', 'Пермь', 'Ростов-на-Дону', 'Санкт-Петербург', 'Саратов', 'Сургут', 'Тверь', 'Тюмень', 'Новый Уренгой', 'Уфа', 'Челябинск' ];
         
-        // Остальной JavaScript код без изменений...
+        // --- Остальной JavaScript ---
         const catalogContainer = document.getElementById('catalog-container');
         const modal = document.getElementById('engineModal');
         const modalContent = document.getElementById('modalContent');
         const purchaseModal = document.getElementById('purchaseModal');
+        const creditModal = document.getElementById('creditModal');
         const besfitsModal = document.getElementById('besfitsModal');
         const besfitsModalContent = document.getElementById('besfitsModalContent');
         const warehouseModal = document.getElementById('warehouseModal');
@@ -271,7 +289,7 @@
         let lightboxGallery = [];
         let lightboxImageIndex = 0;
         let lightboxTouchStartX = 0;
-
+        let currentEngineId = null;
 
         function formatPrice(price) { return new Intl.NumberFormat('ru-RU').format(price) + ' ₽'; }
 
@@ -306,20 +324,20 @@
 
                 groupEngines.sort((a, b) => a.name.localeCompare(b.name)).forEach(engine => {
                     const hasPhoto = engine.gallery && engine.gallery.length > 0;
-                    const mainImage = hasPhoto ? engine.gallery[0] : 'https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter';
+                    const mainImage = hasPhoto ? engine.gallery[0] : 'https://placehold.co/600x400/1D4ED8/FFFFFF?text=Фото+по+запросу&font=inter';
                     
                     const card = document.createElement('div');
                     card.className = 'bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 flex flex-col cursor-pointer';
                     card.setAttribute('onclick', `openModal(${engine.id})`);
                     card.innerHTML = `
                         <div class="relative w-full h-32 sm:h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
-                            <img src="${mainImage}" alt="${engine.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter';">
+                            <img src="${mainImage}" alt="${engine.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1D4ED8/FFFFFF?text=Фото+по+запросу&font=inter';">
                         </div>
                         <div class="p-3 sm:p-4 flex flex-col flex-grow">
-                            <h3 class="text-base sm:text-lg font-semibold mb-1 truncate">${engine.name}</h3>
+                             <h3 class="text-base sm:text-lg font-semibold mb-1 truncate">${engine.name} <span class="text-gray-500 font-normal">${engine.specs['Объем']}</span></h3>
                             <p class="text-sm text-gray-600 mb-2 hidden sm:block">${engine.manufacturer}</p>
                             <p class="text-lg sm:text-xl font-bold text-blue-700">${formatPrice(engine.price)}</p>
-                            <button onclick="showPurchaseInfo(event); event.stopPropagation();" class="mt-auto w-full bg-green-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm mt-3">
+                            <button onclick="showPurchaseInfo(event, ${engine.id}); event.stopPropagation();" class="mt-auto w-full bg-green-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm mt-3">
                                 Купить
                             </button>
                         </div>
@@ -333,7 +351,7 @@
         }
 
         function renderCitiesDropdown() {
-            citiesDropdown.innerHTML = '';
+            citiesDropdown.innerHTML = `<div class="px-4 py-2 text-xs text-gray-500 uppercase">Двигатели в наличии:</div>`;
             cities.sort().forEach(city => {
                 const isCentral = city === 'Челябинск';
                 const cityText = isCentral ? 'Челябинск (центральный склад)' : city;
@@ -411,7 +429,7 @@
                          ${thumbnailsHtml}
                     </div>`;
             } else {
-                 galleryHtml = `<div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center rounded-md overflow-hidden"><img src="https://placehold.co/600x400/1D4ED8/FFFFFF?text=GammaMotors&font=inter" alt="GammaMotors" class="w-full h-full object-cover"></div>`;
+                 galleryHtml = `<div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center rounded-md overflow-hidden"><img src="https://placehold.co/600x400/1D4ED8/FFFFFF?text=Фото+по+запросу&font=inter" alt="Фото по запросу" class="w-full h-full object-cover"></div>`;
             }
             
             const specsHtml = Object.entries(engine.specs).map(([key, value]) => `<div class="flex justify-between py-2 border-b border-gray-200 text-sm"><span class="text-gray-600">${key}</span><span class="font-semibold text-right">${value}</span></div>`).join('');
@@ -461,6 +479,30 @@
                 `;
             }
 
+            let extraVideosHtml = '';
+            if (engine.extraVideos && engine.extraVideos.length > 0) {
+                extraVideosHtml = `
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-lg text-gray-800">Видеообзоры и доработки</h4>
+                        ${engine.extraVideos.map(video => `
+                            <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-r-lg">
+                                <h5 class="font-semibold mb-2 text-green-800 flex items-center">
+                                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    ${video.title}
+                                </h5>
+                                <p class="text-sm text-green-700 mb-3">${video.description}</p>
+                                <div class="relative">
+                                    <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзора" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-green-700\'>Видео скоро будет добавлено.</p>';">
+                                        <source src="${video.url}" type="video/mp4">
+                                    </video>
+                                    <div class="video-overlay"><svg class="w-16 h-16 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
             modalContent.innerHTML = `
                 <div class="md:grid md:grid-cols-2">
                     <!-- Левая часть: Галерея -->
@@ -472,7 +514,7 @@
                     <div class="p-6 md:p-8">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h2 class="text-2xl md:text-3xl font-bold">${engine.name}</h2>
+                                <h2 class="text-2xl md:text-3xl font-bold">${engine.name} <span class="font-normal text-gray-500">${engine.specs['Объем']}</span></h2>
                                 <p class="text-md text-gray-500">${engine.manufacturer}</p>
                             </div>
                             <button onclick="history.back()" class="text-gray-500 hover:text-gray-800 text-4xl">&times;</button>
@@ -481,12 +523,11 @@
                         <div class="space-y-6">
                             <div class="p-4 bg-gray-50 rounded-lg">
                                 <p class="text-3xl font-bold text-blue-700">${formatPrice(engine.price)}</p>
-                                <button onclick="showPurchaseInfo(event)" class="mt-3 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-300 text-lg">
-                                    <svg class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                                    Связаться для покупки
+                                <button onclick="showPurchaseInfo(event, ${engine.id})" class="mt-3 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-300 text-lg">
+                                     Купить
                                 </button>
                             </div>
-
+                                                        
                             ${besfitsPromoHtml}
 
                             <div class="p-4 bg-gray-50 rounded-lg">
@@ -497,6 +538,8 @@
                             ${engine.applications && engine.applications.length > 0 ? applicationsHtml : ''}
                             
                             ${hotStartHtml}
+
+                            ${extraVideosHtml}
 
                         </div>
                     </div>
@@ -516,8 +559,13 @@
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
         }
         
-        function showPurchaseInfo(event) {
+        function showPurchaseInfo(event, engineId) {
             event.stopPropagation();
+            currentEngineId = engineId; 
+            
+            const creditBtn = document.getElementById('credit-info-btn');
+            creditBtn.onclick = () => openCreditModal(); 
+
             history.pushState({modal: 'purchase'}, '', '#purchase');
             purchaseModal.classList.remove('hidden');
             setTimeout(() => { purchaseModal.classList.remove('opacity-0'); purchaseModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
@@ -527,6 +575,54 @@
             purchaseModal.classList.add('opacity-0');
             purchaseModal.querySelector('.modal-content').classList.add('scale-95');
             setTimeout(() => { purchaseModal.classList.add('hidden'); }, 300);
+        }
+
+        function openCreditModal() {
+            if (currentEngineId === null) return;
+            const engine = engines.find(e => e.id === currentEngineId);
+            if (!engine) return;
+
+            purchaseModal.classList.add('hidden');
+
+            const creditPrice = Math.round(engine.price * 1.03);
+            const creditModalContent = document.getElementById('creditModalContent');
+
+            creditModalContent.innerHTML = `
+                <button onclick="history.back()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-2 text-orange-800">Кредит / Рассрочка от ОТП Банка</h3>
+                <p class="mb-4 text-sm text-gray-600">На двигатель: <strong class="font-bold">${engine.name}</strong></p>
+                
+                <div class="mb-6 p-4 bg-gray-100 rounded-lg">
+                    <p class="text-gray-700">Сумма для заявки в банк:</p>
+                    <p class="text-3xl font-bold text-blue-700">${formatPrice(creditPrice)}</p>
+                    <p class="text-xs text-gray-500">(Цена двигателя +3% наценка банка)</p>
+                </div>
+
+                <div class="text-sm text-gray-800 bg-blue-50 p-4 rounded-lg mb-6">
+                    <p class="font-semibold mb-2 text-lg">Инструкция для заявки:</p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>В первом пункте напишите: <strong class="text-blue-700">Двигатель</strong></li>
+                        <li>Выберите категорию: <strong class="text-blue-700">Автозапчасти, шины, диски</strong></li>
+                        <li>В поле "Сумма" укажите: <strong class="text-blue-700">${creditPrice}</strong></li>
+                    </ol>
+                </div>
+                
+                <a href="https://ecom.otpbank.ru/link/DG_WC56jxAJw" target="_blank" class="w-full bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-all duration-300 text-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                    Перейти к заполнению заявки
+                </a>
+                <p class="text-xs text-gray-500 mt-2 text-center">Вы перейдете на сайт банка для предварительного одобрения.</p>
+            `;
+
+            history.pushState({modal: 'credit'}, '', `#credit-info-${engine.name}`);
+            creditModal.classList.remove('hidden');
+            setTimeout(() => { creditModal.classList.remove('opacity-0'); creditModal.querySelector('.modal-content').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeCreditModal() {
+            creditModal.classList.add('opacity-0');
+            creditModal.querySelector('.modal-content').classList.add('scale-95');
+            setTimeout(() => { creditModal.classList.add('hidden'); }, 300);
         }
         
         function renderBesfitsModal() {
@@ -671,8 +767,9 @@
         function closeLightbox() {
             lightboxModal.classList.add('opacity-0');
             setTimeout(() => lightboxModal.classList.add('hidden'), 300);
-            // Восстанавливаем скролл только если никакие другие модальные окна не активны
-            if (document.querySelectorAll('.modal:not(.hidden)').length === 0) {
+            if (document.querySelectorAll('.modal:not(.hidden)').length === 1 && !lightboxModal.classList.contains('hidden')) {
+                 // Do not restore scroll if another modal is open
+            } else if (document.querySelectorAll('.modal:not(.hidden)').length === 0) {
                  document.body.style.overflow = 'auto';
             }
         }
@@ -760,6 +857,7 @@
             closeBesfitsModal();
             closeWarehouseModal();
             closeLightbox();
+            closeCreditModal();
         });
 
         citiesDropdownBtn.addEventListener('click', (event) => { event.stopPropagation(); citiesDropdown.classList.toggle('hidden'); });
@@ -767,6 +865,11 @@
         window.addEventListener('click', () => { if (!citiesDropdown.classList.contains('hidden')) { citiesDropdown.classList.add('hidden'); } });
 
         document.addEventListener('DOMContentLoaded', () => {
+            const g18engine = engines.find(e => e.name === '4G18');
+            if (g18engine) {
+                g18engine.gallery = g18engine.gallery.map(p => p.replace(/g4g18/g, '4g18'));
+            }
+            
             renderManufacturerNav();
             renderEngineGroups();
             renderCitiesDropdown();
@@ -774,7 +877,7 @@
             handleScrollHighlight(); // Initial call
             window.addEventListener('resize', updateStickyNav);
             window.addEventListener('scroll', handleScrollHighlight);
-            history.replaceState(null, '', window.location.pathname); // Очищаем хэш при загрузке
+            history.replaceState(null, '', window.location.pathname); 
         });
     </script>
 </body>
