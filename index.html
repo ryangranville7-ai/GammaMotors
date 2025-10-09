@@ -293,6 +293,23 @@
 
         function formatPrice(price) { return new Intl.NumberFormat('ru-RU').format(price) + ' ₽'; }
 
+        function playVideo(videoId) {
+            const video = document.getElementById(videoId);
+            const overlay = video.nextElementSibling;
+            if (video) {
+                video.play();
+                video.setAttribute('controls', 'true');
+                if (overlay) {
+                    overlay.style.pointerEvents = 'none';
+                    overlay.style.opacity = '0';
+                }
+                if (video.parentElement.onclick) {
+                    video.parentElement.onclick = null;
+                    video.parentElement.style.cursor = 'default';
+                }
+            }
+        }
+
         function renderManufacturerNav() {
             manufacturerNav.innerHTML = '';
             manufacturers.forEach(manufacturer => {
@@ -324,14 +341,20 @@
 
                 groupEngines.sort((a, b) => a.name.localeCompare(b.name)).forEach(engine => {
                     const hasPhoto = engine.gallery && engine.gallery.length > 0;
-                    const mainImage = hasPhoto ? engine.gallery[0] : 'https://placehold.co/600x400/1D4ED8/FFFFFF?text=Фото+по+запросу&font=inter';
+                    
+                    let imageHtml;
+                    if (hasPhoto) {
+                        imageHtml = `<img src="${engine.gallery[0]}" alt="${engine.name}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML = '<div class=\\'w-full h-full bg-blue-700 flex items-center justify-center p-2\\'><span class=\\'text-white font-semibold text-center\\'>Фото по запросу</span></div>';">`;
+                    } else {
+                        imageHtml = `<div class="w-full h-full bg-blue-700 flex items-center justify-center p-2"><span class="text-white font-semibold text-center">Фото по запросу</span></div>`;
+                    }
                     
                     const card = document.createElement('div');
                     card.className = 'bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 flex flex-col cursor-pointer';
                     card.setAttribute('onclick', `openModal(${engine.id})`);
                     card.innerHTML = `
                         <div class="relative w-full h-32 sm:h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
-                            <img src="${mainImage}" alt="${engine.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1D4ED8/FFFFFF?text=Фото+по+запросу&font=inter';">
+                            ${imageHtml}
                         </div>
                         <div class="p-3 sm:p-4 flex flex-col flex-grow">
                              <h3 class="text-base sm:text-lg font-semibold mb-1 truncate">${engine.name} <span class="text-gray-500 font-normal">${engine.specs['Объем']}</span></h3>
@@ -429,7 +452,7 @@
                          ${thumbnailsHtml}
                     </div>`;
             } else {
-                 galleryHtml = `<div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center rounded-md overflow-hidden"><img src="https://placehold.co/600x400/1D4ED8/FFFFFF?text=Фото+по+запросу&font=inter" alt="Фото по запросу" class="w-full h-full object-cover"></div>`;
+                 galleryHtml = `<div class="w-full h-64 md:h-full bg-blue-700 flex items-center justify-center p-4 rounded-md"><span class="text-white font-semibold text-center text-xl">Фото по запросу</span></div>`;
             }
             
             const specsHtml = Object.entries(engine.specs).map(([key, value]) => `<div class="flex justify-between py-2 border-b border-gray-200 text-sm"><span class="text-gray-600">${key}</span><span class="font-semibold text-right">${value}</span></div>`).join('');
@@ -465,12 +488,13 @@
 
             let hotStartHtml = '';
             if ((engine.manufacturer === 'Hyundai / Kia' || engine.manufacturer === 'VAG') && engine.hotStartVideo) {
+                const hotStartVideoId = `hot-start-video-${engine.id}`;
                 hotStartHtml = `
                     <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
                         <h4 class="font-semibold mb-2 text-yellow-800 flex items-center"><svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.52 2.232a1 1 0 011.085.642l1.68 5.17h5.17a1 1 0 01.643 1.086 38.6 38.6 0 01-2.28 10.125.999.999 0 01-.913.645H2.086a1 1 0 01-.913-.645A38.599 38.599 0 01-.113 9.13a1 1 0 01.643-1.086h5.17l1.68-5.17a1 1 0 011.085-.642h3.044zM9.462 8.93c.27-.27.27-.707 0-.979a.692.692 0 00-.979 0l-1.68 1.68a.692.692 0 000 .979l1.68 1.68a.692.692 0 00.979 0c.27-.27.27-.707 0-.979L8.49 10.32l.972-.972zm1.06-2.652c.27-.27.707-.27.979 0l1.68 1.68a.692.692 0 010 .979l-1.68 1.68a.692.692 0 01-.979 0c-.27-.27-.27-.707 0-.979l.972-.972-.972-.972z" clip-rule="evenodd" /></svg>Проверка "Горячего Запуска"</h4>
                         <p class="text-sm text-yellow-700 mb-3">Видео заводской проверки доступно по запросу и привязано к уникальному номеру двигателя.</p>
-                        <div class="relative">
-                            <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-yellow-700\'>Видео для этой модели скоро будет добавлено.</p>';">
+                        <div class="relative rounded-lg overflow-hidden shadow-inner cursor-pointer" onclick="playVideo('${hotStartVideoId}')">
+                            <video id="${hotStartVideoId}" controlsList="nodownload" preload="metadata" class="w-full" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+запуска" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-yellow-700\'>Видео для этой модели скоро будет добавлено.</p>';">
                                 <source src="${engine.hotStartVideo}" type="video/mp4">
                             </video>
                             <div class="video-overlay"><svg class="w-16 h-16 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>
@@ -484,21 +508,23 @@
                 extraVideosHtml = `
                     <div class="space-y-4">
                         <h4 class="font-semibold text-lg text-gray-800">Видеообзоры и доработки</h4>
-                        ${engine.extraVideos.map(video => `
+                        ${engine.extraVideos.map((video, index) => {
+                            const extraVideoId = `extra-video-${engine.id}-${index}`;
+                            return `
                             <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-r-lg">
                                 <h5 class="font-semibold mb-2 text-green-800 flex items-center">
                                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     ${video.title}
                                 </h5>
                                 <p class="text-sm text-green-700 mb-3">${video.description}</p>
-                                <div class="relative">
-                                    <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow-inner" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзора" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-green-700\'>Видео скоро будет добавлено.</p>';">
+                                <div class="relative rounded-lg overflow-hidden shadow-inner cursor-pointer" onclick="playVideo('${extraVideoId}')">
+                                    <video id="${extraVideoId}" controlsList="nodownload" preload="metadata" class="w-full" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+обзора" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1" onerror="this.parentElement.innerHTML = '<p class=\'text-sm text-green-700\'>Видео скоро будет добавлено.</p>';">
                                         <source src="${video.url}" type="video/mp4">
                                     </video>
                                     <div class="video-overlay"><svg class="w-16 h-16 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>
                                 </div>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                 `;
             }
@@ -639,9 +665,10 @@
             
             let videoHtml = '<div class="bg-black text-white rounded-lg h-48 flex items-center justify-center"><span class="italic">Видео скоро будет добавлено</span></div>';
             if (besfitsMedia.video) {
+                const besfitsVideoId = 'besfits-video';
                 videoHtml = `
-                    <div class="relative">
-                        <video controls controlsList="nodownload" preload="metadata" class="w-full rounded-lg shadow" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1">
+                    <div class="relative rounded-lg overflow-hidden shadow cursor-pointer" onclick="playVideo('${besfitsVideoId}')">
+                        <video id="${besfitsVideoId}" controlsList="nodownload" preload="metadata" class="w-full" poster="https://placehold.co/1280x720/000000/FFFFFF?text=Видео+маркировок" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1">
                             <source src="${besfitsMedia.video}" type="video/mp4">
                             Ваш браузер не поддерживает это видео.
                         </video>
@@ -720,12 +747,13 @@
             });
 
             videosContainer.innerHTML = '';
-            warehouseMedia.videos.forEach(video => {
+            warehouseMedia.videos.forEach((video, index) => {
+                const warehouseVideoId = `warehouse-video-${index}`;
                 const videoEl = document.createElement('div');
                 videoEl.className = 'bg-gray-100 rounded-lg overflow-hidden shadow';
                 videoEl.innerHTML = `
-                    <div class="relative">
-                        <video controls controlsList="nodownload" preload="metadata" class="w-full" poster="${video.thumbnail}" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1">
+                    <div class="relative rounded-lg overflow-hidden shadow-inner cursor-pointer" onclick="playVideo('${warehouseVideoId}')">
+                        <video id="${warehouseVideoId}" controlsList="nodownload" preload="metadata" class="w-full" poster="${video.thumbnail}" onloadeddata="this.poster=''" onplay="this.nextElementSibling.style.opacity = 0" onpause="this.nextElementSibling.style.opacity = 1">
                             <source src="${video.videoUrl}" type="video/mp4">
                             Ваш браузер не поддерживает видео.
                         </video>
